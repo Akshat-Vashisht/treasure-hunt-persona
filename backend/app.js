@@ -1,29 +1,54 @@
 const express = require("express");
-const cors = require("cors");
-const { MongoClient } = require("mongodb");
-require("dotenv").config();
+const session = require("express-session");
+const passport = require("passport");
+require("./auth");
 
 const app = express();
-const port = process.env.PORT || 5000;
 
-let db;
-app.use(cors());
-app.use(express.json());
+function isLoggedIn(req, res, next) {
+  req.user ? next() : res.sendStatus(401);
+}
 
-const url = process.env.DB_URL;
-const dbName = "treausreHunt"; //Database name
-const collectionName = "leaderboard"; // LeaderBoard
-const stockCollection = "stock"; // StockCollection
-
-MongoClient.connect(url)
-  .then((client) => {
-    db = client.db(dbName);
-    console.log("Successfully established connection with MongoDB");
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: true,
   })
-  .catch((err) => {
-    throw err;
-  });
+);
 
-app.listen(port, () => {
-  console.log(`Server listening at http://localhost:${port}`);
+app.use(passport.initialize());
+app.use(passport.session());
+
+app.get("/", (req, res) => {
+  res.send('<a href="/auth/google">Authenticate with Google</a>');
 });
+
+app.get(
+  "/auth/google",
+  passport.authenticate("google", { scope: ["email", "profile"] })
+);
+
+app.get(
+  "/auth/google/callback",
+  passport.authenticate("google", {
+    successRedirect: "/protected",
+    failureRedirect: "/auth/google/failure",
+  })
+);
+
+app.get("/protected", isLoggedIn, (req, res) => {
+  res.send(`Hello ${req.user.displayName}`);
+});
+
+app.get("/logout", (req, res) => {
+  req.logout();
+  req.session.destroy();
+  res.send("Goodbye!");
+});
+
+app.get("/auth/google/failure", (req, res) => {
+  res.send("Failed to authenticate..");
+});
+
+app.listen(5000, () => console.log("listening on port: 5000"));
