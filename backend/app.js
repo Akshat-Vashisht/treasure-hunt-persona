@@ -6,13 +6,9 @@ require("./auth");
 
 const app = express();
 
-app.use(
-  cors({
-    origin: "*",
-    methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
-    credentials: true,
-  })
-);
+app.use(cors());
+app.use(passport.initialize());
+app.use(passport.session());
 
 function isLoggedIn(req, res, next) {
   req.user ? next() : res.sendStatus(401);
@@ -26,12 +22,22 @@ app.use(
   })
 );
 
-app.use(passport.initialize());
-app.use(passport.session());
-
 app.get("/", (req, res) => {
   res.send('<a href="/auth/google">Authenticate with Google</a>');
 });
+
+// app.get(
+//   "/auth/google",
+//   passport.authenticate("google", { scope: ["email", "profile"] })
+// );
+
+// app.get(
+//   "/auth/google/callback",
+//   passport.authenticate("google", {
+//     successRedirect: "/protected",
+//     failureRedirect: "/auth/google/failure",
+//   })
+// );
 
 app.get(
   "/auth/google",
@@ -40,11 +46,20 @@ app.get(
 
 app.get(
   "/auth/google/callback",
-  passport.authenticate("google", {
-    successRedirect: "/protected",
-    failureRedirect: "/auth/google/failure",
-  })
+  passport.authenticate("google", { failureRedirect: "/" }),
+  function (req, res) {
+    // Successful authentication, redirect home.
+    res.redirect("/protected");
+  }
 );
+
+// router.get(
+//   "/oauth2/redirect/google",
+//   passport.authenticate("google", {
+//     successRedirect: "/",
+//     failureRedirect: "/login",
+//   })
+// );
 
 app.get("/protected", isLoggedIn, (req, res) => {
   res.json(req.user.displayName);
