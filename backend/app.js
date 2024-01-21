@@ -6,7 +6,12 @@ require("./auth");
 
 const app = express();
 
-app.use(cors());
+app.use(
+  cors({
+    origin: "http://127.0.0.0.1:3001",
+    credentials: true,
+  })
+);
 app.use(passport.initialize());
 app.use(passport.session());
 
