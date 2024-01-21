@@ -14,6 +14,16 @@ app.use(
 );
 app.use(passport.initialize());
 app.use(passport.session());
+app.use((req, res, next) => {
+  res.header("Access-Control-Allow-Origin", "http://127.0.0.0.1:3001");
+  res.header("Access-Control-Allow-Methods", "GET, POST, OPTIONS, PUT, DELETE");
+  res.header(
+    "Access-Control-Allow-Headers",
+    "Origin, X-Requested-With, Content-Type, Accept"
+  );
+  res.header("Access-Control-Allow-Credentials", true);
+  next();
+});
 
 function isLoggedIn(req, res, next) {
   req.user ? next() : res.sendStatus(401);
