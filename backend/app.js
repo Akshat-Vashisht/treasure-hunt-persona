@@ -5,22 +5,13 @@ const cors = require("cors");
 require("./auth");
 
 const app = express();
-const corsOptions = {
-  origin: "http://127.0.0.1:3001",
-  credentials: true,
-};
-app.use(cors());
 
-app.use((req, res, next) => {
-  res.header("Access-Control-Allow-Origin", "http://127.0.0.1:3001");
-  res.header("Access-Control-Allow-Methods", "GET, POST, OPTIONS, PUT, DELETE");
-  res.header(
-    "Access-Control-Allow-Headers",
-    "Origin, X-Requested-With, Content-Type, Accept"
-  );
-  res.header("Access-Control-Allow-Credentials", true);
-  next();
-});
+app.use(
+  cors({
+    origin: "http://127.0.0.1:3001",
+    credentials: true,
+  })
+);
 
 function isLoggedIn(req, res, next) {
   req.user ? next() : res.sendStatus(401);
