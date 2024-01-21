@@ -5,11 +5,11 @@ const cors = require("cors");
 require("./auth");
 
 const app = express();
-const corsOptions = {
-  origin: "http://127.0.0.1:3001",
-  credentials: true,
-};
-app.use(cors(corsOptions));
+// const corsOptions = {
+//   origin: ["http://127.0.0.1:3001"],
+//   credentials: true,
+// };
+app.use(cors());
 
 function isLoggedIn(req, res, next) {
   req.user ? next() : res.sendStatus(401);
