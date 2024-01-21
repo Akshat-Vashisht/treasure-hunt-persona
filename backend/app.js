@@ -1,6 +1,7 @@
 const express = require("express");
 const session = require("express-session");
 const passport = require("passport");
+const cors = require("cors");
 require("./auth");
 
 const app = express();
@@ -8,6 +9,7 @@ const app = express();
 function isLoggedIn(req, res, next) {
   req.user ? next() : res.sendStatus(401);
 }
+app.use(cors());
 
 app.use(
   session({
