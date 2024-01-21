@@ -5,11 +5,11 @@ const cors = require("cors");
 require("./auth");
 
 const app = express();
+app.use(cors());
 
 function isLoggedIn(req, res, next) {
   req.user ? next() : res.sendStatus(401);
 }
-app.use(cors());
 
 app.use(
   session({
