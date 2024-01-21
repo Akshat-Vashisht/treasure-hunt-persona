@@ -12,19 +12,15 @@ app.use(
     credentials: true,
   })
 );
-app.use(session);
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: false,
+  })
+);
 app.use(passport.initialize());
 app.use(passport.session());
-app.use((req, res, next) => {
-  res.header("Access-Control-Allow-Origin", "http://127.0.0.0.1:3001");
-  res.header("Access-Control-Allow-Methods", "GET, POST, OPTIONS, PUT, DELETE");
-  res.header(
-    "Access-Control-Allow-Headers",
-    "Origin, X-Requested-With, Content-Type, Accept"
-  );
-  res.header("Access-Control-Allow-Credentials", true);
-  next();
-});
 
 function isLoggedIn(req, res, next) {
   req.user ? next() : res.sendStatus(401);
@@ -42,19 +38,6 @@ app.get("/", (req, res) => {
   res.send('<a href="/auth/google">Authenticate with Google</a>');
 });
 
-// app.get(
-//   "/auth/google",
-//   passport.authenticate("google", { scope: ["email", "profile"] })
-// );
-
-// app.get(
-//   "/auth/google/callback",
-//   passport.authenticate("google", {
-//     successRedirect: "/protected",
-//     failureRedirect: "/auth/google/failure",
-//   })
-// );
-
 app.get(
   "/auth/google",
   passport.authenticate("google", { scope: ["email", "profile"] })
@@ -62,20 +45,11 @@ app.get(
 
 app.get(
   "/auth/google/callback",
-  passport.authenticate("google", { failureRedirect: "/" }),
-  function (req, res) {
-    // Successful authentication, redirect home.
-    res.redirect("/protected");
-  }
+  passport.authenticate("google", {
+    successRedirect: "/protected",
+    failureRedirect: "/auth/google/failure",
+  })
 );
-
-// router.get(
-//   "/oauth2/redirect/google",
-//   passport.authenticate("google", {
-//     successRedirect: "/",
-//     failureRedirect: "/login",
-//   })
-// );
 
 app.get("/protected", isLoggedIn, (req, res) => {
   res.json(req.user.displayName);
