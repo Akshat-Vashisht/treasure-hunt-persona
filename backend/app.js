@@ -38,17 +38,17 @@ app.get(
 );
 
 app.get("/protected", isLoggedIn, (req, res) => {
-  res.send(`Hello ${req.user.displayName}`);
+  res.json(req.user.displayName);
 });
 
 app.get("/logout", (req, res) => {
   req.logout();
   req.session.destroy();
-  res.send("Goodbye!");
+  res.json("Logged out");
 });
 
 app.get("/auth/google/failure", (req, res) => {
-  res.send("Failed to authenticate..");
+  res.json("Failed to authenticate");
 });
 
 app.listen(5000, () => console.log("listening on port: 5000"));
