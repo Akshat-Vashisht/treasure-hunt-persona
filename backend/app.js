@@ -4,7 +4,7 @@ const passport = require("passport");
 const cors = require("cors");
 require("./auth");
 
-const CLIENT_URL = "http://localhost:3000/";
+const CLIENT_URL = "http://localhost:3001";
 const app = express();
 
 app.use(
@@ -18,6 +18,7 @@ app.use(
   cors({
     origin: "http://127.0.0.1:3001",
     credentials: true,
+    methods:['GET', 'PUT', 'POST'],
   })
 );
 app.use(passport.initialize());
@@ -55,6 +56,7 @@ app.get(
 );
 
 app.get("/protected", isLoggedIn, (req, res) => {
+  console.log(req)
   res.json(req.user.displayName);
 });
 
