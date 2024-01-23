@@ -1,63 +1,61 @@
 const express = require("express");
-const session = require("express-session");
-const passport = require("passport");
+const http = require("http");
+const socketIO = require("socket.io");
 const cors = require("cors");
-require("./auth");
 
-// const CLIENT_URL = "http://localhost:3000";
 const app = express();
+const server = http.createServer(app);
 
-app.use(
-  session({
-    secret: process.env.SESSION_SECRET,
-    resave: false,
-    saveUninitialized: false,
-  })
-);
+// Enable CORS for all routes
 app.use(
   cors({
-    origin: "http://127.0.0.1:3000",
+    origin: "*",
     credentials: true,
     methods: ["GET", "PUT", "POST", "DELETE"],
   })
 );
-app.use(passport.initialize());
-app.use(passport.session());
 
-function isLoggedIn(req, res, next) {
-  req.user ? next() : res.sendStatus(401);
+const io = socketIO(server, {
+  cors: {
+    origin: "*",
+    methods: ["GET", "PUT", "POST", "DELETE"],
+    credentials: true,
+  },
+});
+
+let timerValue = 0;
+let timerInterval;
+
+app.get("/", (req, res) => {
+  res.send("Hello from Socket.IO server");
+});
+
+io.on("connection", (socket) => {
+  console.log("A user connected");
+
+  // Send the initial timer value to the newly connected client
+  io.to(socket.id).emit("timer", timerValue);
+
+  // Handle disconnection
+  socket.on("disconnect", () => {
+    console.log("User disconnected");
+  });
+});
+
+// Start the timer on the server
+function startTimer() {
+  timerInterval = setInterval(() => {
+    timerValue++;
+    // Emit the updated timer value to all connected clients
+    console.log(timerValue);
+    io.emit("timer", timerValue);
+  }, 1000);
 }
 
-// app.get("/", (req, res) => {
-//   res.send('<a href="/auth/google">Authenticate with Google</a>');
-// });
+// Start the timer when the server is started
+startTimer();
 
-app.get(
-  "/auth/google",
-  passport.authenticate("google", { scope: ["email", "profile"] })
-);
-
-app.get(
-  "/auth/google/callback",
-  passport.authenticate("google", {
-    successRedirect: "/protected",
-    failureRedirect: "/auth/google/failure",
-  })
-);
-
-app.get("/protected", isLoggedIn, (req, res) => {
-  console.log(req.user);
-  res.json(req.user);
+const PORT = 5000;
+server.listen(PORT, () => {
+  console.log(`Socket.IO server is running on port ${PORT}`);
 });
-
-app.get("/logout", (req, res) => {
-  req.logout();
-  req.session.destroy();
-  res.json("Logged out");
-});
-
-app.get("/auth/google/failure", (req, res) => {
-  res.json("Failed to authenticate");
-});
-
-app.listen(5000, () => console.log("listening on port: 5000"));
