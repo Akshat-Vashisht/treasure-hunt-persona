@@ -2,6 +2,7 @@ const express = require("express");
 const http = require("http");
 const socketIO = require("socket.io");
 const cors = require("cors");
+require('dotenv').config()
 // const bodyParser = require("body-parser");
 
 const app = express();
@@ -56,8 +57,6 @@ app.get("/", (req, res) => {
 
 app.post("/", (req, res) => {
   const adminPass = req.body.adminPass;
-  console.log(req);
-  console.log(adminPass);
   if (adminPass != process.env.ADMIN_PASS) {
     return res.status(401).json({ Description: "Unauthorized" });
   }
