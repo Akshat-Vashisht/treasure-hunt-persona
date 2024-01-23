@@ -6,15 +6,14 @@ import Protected from "./pages/Protected";
 import SocketClient from "./SocketClient";
 import Login from "./pages/Login";
 
-
 function App() {
   return (
     <Router>
       <Routes>
-      <Route path="/" element={<Login />} />
+        <Route path="/" element={<Login />} />
         <Route path="/protected" element={<Protected />} />
+        <Route path="/game" element={<SocketClient />} />
       </Routes>
-      <SocketClient/>
     </Router>
   );
 }

@@ -2,8 +2,11 @@ const express = require("express");
 const http = require("http");
 const socketIO = require("socket.io");
 const cors = require("cors");
+// const bodyParser = require("body-parser");
 
 const app = express();
+// app.use(bodyParser.urlencoded({ extended: true }));
+app.use(express.json())
 const server = http.createServer(app);
 
 // Enable CORS for all routes
@@ -24,11 +27,6 @@ const io = socketIO(server, {
 });
 
 let timerValue = 0;
-let timerInterval;
-
-app.get("/", (req, res) => {
-  res.send("Hello from Socket.IO server");
-});
 
 io.on("connection", (socket) => {
   console.log("A user connected");
@@ -52,8 +50,23 @@ function startTimer() {
   }, 1000);
 }
 
-// Start the timer when the server is started
-startTimer();
+app.get("/", (req, res) => {
+  //
+});
+
+app.post("/", (req, res) => {
+  const adminPass = req.body.adminPass;
+  console.log(req);
+  console.log(adminPass);
+  if (adminPass != process.env.ADMIN_PASS) {
+    return res.status(401).json({ Description: "Unauthorized" });
+  }
+  return res.status(200).json({ Description: "Authorized" });
+});
+
+app.get("/game", (req, res) => {
+  startTimer();
+});
 
 const PORT = 5000;
 server.listen(PORT, () => {
