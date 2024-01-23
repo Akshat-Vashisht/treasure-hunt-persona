@@ -12,7 +12,7 @@ const Login = () => {
     try {
       const res = await axios.post("http://localhost:5000/", data);
       console.log(res);
-      if(res.status == 200){
+      if(res.status === 200){
         navigate('/game');
       }
     } catch (error) {

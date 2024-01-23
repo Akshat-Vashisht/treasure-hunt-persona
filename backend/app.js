@@ -2,12 +2,12 @@ const express = require("express");
 const http = require("http");
 const socketIO = require("socket.io");
 const cors = require("cors");
-require('dotenv').config()
+require("dotenv").config();
 // const bodyParser = require("body-parser");
 
 const app = express();
 // app.use(bodyParser.urlencoded({ extended: true }));
-app.use(express.json())
+app.use(express.json());
 const server = http.createServer(app);
 
 // Enable CORS for all routes
