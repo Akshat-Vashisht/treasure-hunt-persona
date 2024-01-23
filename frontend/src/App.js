@@ -4,12 +4,14 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
 import Protected from "./pages/Protected";
 import SocketClient from "./SocketClient";
+import Login from "./pages/Login";
 
 
 function App() {
   return (
     <Router>
       <Routes>
+      <Route path="/" element={<Login />} />
         <Route path="/protected" element={<Protected />} />
       </Routes>
       <SocketClient/>
