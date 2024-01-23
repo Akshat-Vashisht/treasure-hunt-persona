@@ -1,16 +1,30 @@
-import React from "react";
+import React, { useState } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 const Login = () => {
+  const navigate = useNavigate();
+  const [data, setData] = useState({
+    teamName : "",
+    adminPass: ""
+  })
   async function login() {
     try {
-      const res = await axios.post("http://localhost:5000/", {
-        adminPass: "teri maa mummaaaa",
-      });
+      const res = await axios.post("http://localhost:5000/", data);
       console.log(res);
+      if(res.status == 200){
+        navigate('/game');
+      }
     } catch (error) {
       console.error(error);
     }
+  }
+  const handleChange=(event)=>{
+    const {name, value} = event.target;
+    setData({
+      ...data,
+      [name]:value
+    })
   }
 
   return (
@@ -24,7 +38,9 @@ const Login = () => {
           <input
             placeholder="Enter Team Name"
             className="px-2 py-1 border focus:outline-none rounded-md"
-            name="team_name"
+            value={data.teamName}
+            onChange={handleChange}
+            name="teamName"
             type="text"
           />
           <label className="text-left" htmlFor="adminPass">
@@ -33,6 +49,8 @@ const Login = () => {
           <input
             placeholder="Password"
             className="px-2 py-1 border focus:outline-none rounded-md"
+            value={data.adminPass}
+            onChange={handleChange}
             name="adminPass"
             type="password"
           />
