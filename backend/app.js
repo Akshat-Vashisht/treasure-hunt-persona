@@ -3,10 +3,8 @@ const http = require("http");
 const socketIO = require("socket.io");
 const cors = require("cors");
 require("dotenv").config();
-// const bodyParser = require("body-parser");
 
 const app = express();
-// app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.json());
 const server = http.createServer(app);
 
@@ -27,32 +25,58 @@ const io = socketIO(server, {
   },
 });
 
-let timerValue = 0;
+let timerValue = 120; // Set the initial timer value to 2 minutes (2 * 60 seconds)
+let timerInterval;
 
 io.on("connection", (socket) => {
   console.log("A user connected");
 
   // Send the initial timer value to the newly connected client
-  io.to(socket.id).emit("timer", timerValue);
+  io.to(socket.id).emit("timer", formatTimer(timerValue));
 
   // Handle disconnection
   socket.on("disconnect", () => {
     console.log("User disconnected");
+  });
+
+  socket.on("startTimer", () => {
+    console.log("Starting timer...");
+    
+    // Clear the existing timer interval before starting a new one
+    clearInterval(timerInterval);
+    
+    startTimer();
   });
 });
 
 // Start the timer on the server
 function startTimer() {
   timerInterval = setInterval(() => {
-    timerValue++;
-    // Emit the updated timer value to all connected clients
-    console.log(timerValue);
-    io.emit("timer", timerValue);
+    if (timerValue > 0) {
+      timerValue--;
+    }
+    const formattedTimer = formatTimer(timerValue);
+
+    console.log(formattedTimer);
+    io.emit("timer", formattedTimer);
+
+    if (timerValue === 0) {
+      clearInterval(timerInterval);
+      console.log("Timer stopped");
+    }
   }, 1000);
 }
 
-app.get("/", (req, res) => {
-  //
+// Format the timer value to "mm:ss"
+function formatTimer(timerValue) {
+  const minutes = String(Math.floor(timerValue / 60)).padStart(2, '0');
+  const seconds = String(timerValue % 60).padStart(2, '0');
+  return `${minutes}:${seconds}`;
+}
+
+// API endpoint to get the current timer value
+app.get("/api/timer", (req, res) => {
+  res.json({ timer: formatTimer(timerValue) });
 });
 
 app.post("/", (req, res) => {
@@ -61,10 +85,6 @@ app.post("/", (req, res) => {
     return res.status(401).json({ Description: "Unauthorized" });
   }
   return res.status(200).json({ Description: "Authorized" });
-});
-
-app.get("/game", (req, res) => {
-  startTimer();
 });
 
 const PORT = 5000;
