@@ -41,10 +41,9 @@ io.on("connection", (socket) => {
 
   socket.on("startTimer", () => {
     console.log("Starting timer...");
-    
+
     // Clear the existing timer interval before starting a new one
     clearInterval(timerInterval);
-    
     startTimer();
   });
 });
@@ -69,8 +68,8 @@ function startTimer() {
 
 // Format the timer value to "mm:ss"
 function formatTimer(timerValue) {
-  const minutes = String(Math.floor(timerValue / 60)).padStart(2, '0');
-  const seconds = String(timerValue % 60).padStart(2, '0');
+  const minutes = String(Math.floor(timerValue / 60)).padStart(2, "0");
+  const seconds = String(timerValue % 60).padStart(2, "0");
   return `${minutes}:${seconds}`;
 }
 
