@@ -17,17 +17,17 @@ const Register = () => {
       teamName,
       adminPass:adminPass.value
     }
-    // setData({...data,adminPass:data.adminPass.value});
+
     console.log(newState);
-    // try {
-    //   const res = await axios.post("http://localhost:5000/", data);
-    //   console.log(res);
-    //   if (res.status === 200) {
-    //     navigate("/game");
-    //   }
-    // } catch (error) {
-    //   console.error(error);
-    // }
+    try {
+      const res = await axios.post("http://localhost:5000/", newState);
+      console.log(res);
+      if (res.status === 200) {
+        navigate("/game");
+      }
+    } catch (error) {
+      console.error(error);
+    }
   }
   const handleChange = (event) => {
     const { name, value } = event.target;
