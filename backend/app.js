@@ -138,6 +138,15 @@ app.post("/", async (req, res) => {
   return res.status(200).json({ Description: "Authorized" });
 });
 
+app.get("/questions", async (req, res) => {
+  try {
+    const questions = await fetchQuestions();
+    res.status(200).json(questions);
+  } catch (err) {
+    res.status(500).json(err);
+  }
+});
+
 async function checkAnswer(qId) {
   try {
     const question = await db.collection(questionsCollection).findOne({
@@ -160,12 +169,24 @@ async function fetchTeamName(teamName) {
     }
     await db.collection(leaderboardCollection).insertOne({
       teamName: teamName,
-      points: 0,
-      crates: 0,
+      timeTaken: 0,
+      cratesOpened: 0,
       finished: false,
     });
   } catch (error) {
     throw new error("Error creating team");
+  }
+}
+
+async function fetchQuestions() {
+  try {
+    const questions = await db
+      .collection(questionsCollection)
+      .find({}, { projection: { _id: 0, id: 1, question: 1 } })
+      .toArray();
+    return questions;
+  } catch (err) {
+    return err;
   }
 }
 
