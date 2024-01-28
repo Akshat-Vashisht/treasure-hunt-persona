@@ -35,6 +35,15 @@ const GameView = () => {
       socket.disconnect();
     };
   }, []);
+  const handleBeforeUnload = (event) => {
+    const confirmationMessage = "Are you sure you want to leave?";
+    event.returnValue = confirmationMessage; // Standard for most browsers
+    return confirmationMessage; // For some older browsers
+  };
+  window.addEventListener("beforeunload", handleBeforeUnload);
+
+
+
   function checkTimerStop() {
     let strArr = timer.split(":");
     let numArr = strArr.map((item) => +item);
@@ -45,8 +54,10 @@ const GameView = () => {
   useEffect(() => {
     checkTimerStop();
   }, [timer]);
+
+
   return (
-    <div  className="">
+    <div className="">
       {" "}
       <div
         style={{
@@ -57,14 +68,13 @@ const GameView = () => {
       >
         <span className=" bg-[#151F21] h-[6rem] blur-lg opacity-40 -bottom-10 w-full absolute"></span>
       </div>
-
-        <h1 className="absolute z-50 bg-black text-white right-0 top-4 p-2 min-w-[9rem] rounded-s-md flex items-center gap-x-1">
-          <MdOutlineTimer />
-          Timer: {timer}
-        </h1>
-        <div className="mt-[10rem]">
-          <GameQues />
-        </div>
+      <h1 className="absolute z-50 bg-black text-white right-0 top-4 p-2 min-w-[9rem] rounded-s-md flex items-center gap-x-1">
+        <MdOutlineTimer />
+        Timer: {timer}
+      </h1>
+      <div className="mt-[10rem]">
+        <GameQues />
+      </div>
     </div>
   );
 };
