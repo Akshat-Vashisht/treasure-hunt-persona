@@ -8,6 +8,24 @@ const app = express();
 app.use(express.json());
 const server = http.createServer(app);
 
+const { MongoClient } = require("mongodb");
+const url = process.env.DB_URL;
+
+const dbName = "testDB";
+const questionsCollection = "questions";
+const leaderboardCollection = "leaderboard";
+
+let db;
+
+MongoClient.connect(url)
+  .then((client) => {
+    db = client.db(dbName);
+    console.log("Successfully established connection with MongoDB");
+  })
+  .catch((err) => {
+    throw err;
+  });
+
 // Enable CORS for all routes
 app.use(
   cors({
@@ -31,30 +49,22 @@ const userTimers = {};
 io.on("connection", (socket) => {
   console.log("A user connected");
 
-  // Initialize user-specific timer
   userTimers[socket.id] = {
     value: 120, // Initial timer value in seconds
     interval: null, // Timer interval reference
   };
 
-  // Send the initial timer value to the newly connected client
   io.to(socket.id).emit("timer", formatTimer(userTimers[socket.id].value));
 
-  // Handle disconnection
   socket.on("disconnect", () => {
     console.log("User disconnected");
-    // Clear the user-specific timer interval on disconnection
     clearInterval(userTimers[socket.id].interval);
     delete userTimers[socket.id];
   });
 
   socket.on("startTimer", () => {
     console.log("Starting timer...");
-
-    // Clear the existing user-specific timer interval before starting a new one
     clearInterval(userTimers[socket.id].interval);
-
-    // Start the user-specific timer
     startUserTimer(socket.id);
   });
 });
@@ -85,7 +95,7 @@ function formatTimer(timerValue) {
 }
 
 // API endpoint to get the current user-specific timer value
-app.get("/api/timer", (req, res) => {
+app.get("/timer", (req, res) => {
   const socketId = req.query.socketId;
   // console.log(userTimers);
   // console.log(socketId);
@@ -96,13 +106,68 @@ app.get("/api/timer", (req, res) => {
   }
 });
 
-app.post("/", (req, res) => {
+app.get("/game", async (req, res) => {
+  try {
+    const qId = req.body.qId;
+    const userAnswer = req.body.userAnswer;
+    const actualAnswer = await checkAnswer(qId);
+    if (actualAnswer.toLowerCase() === userAnswer.toLowerCase()) {
+      return res.json({ success: true });
+    } else {
+      return res.json({ success: false });
+    }
+  } catch (err) {
+    res.status(500).json({ Description: err });
+  }
+});
+
+app.post("/", async (req, res) => {
   const adminPass = req.body.adminPass;
-  if (adminPass != process.env.ADMIN_PASS) {
-    return res.status(401).json({ Description: "Unauthorized" });
+  const teamName = req.body.teamName;
+  try {
+    if (adminPass != process.env.ADMIN_PASS) {
+      return res.status(401).json({ Description: "Unauthorized" });
+    }
+    const foundTeamName = await fetchTeamName(teamName);
+    if (foundTeamName) {
+      return res.status(409).json({ Description: "Team name already exists" });
+    }
+  } catch (err) {
+    return res.status(500).json({ Description: err });
   }
   return res.status(200).json({ Description: "Authorized" });
 });
+
+async function checkAnswer(qId) {
+  try {
+    const question = await db.collection(questionsCollection).findOne({
+      id: qId,
+    });
+    return question.answer;
+  } catch (err) {
+    return err;
+  }
+}
+
+async function fetchTeamName(teamName) {
+  teamName = teamName.toLowerCase();
+  try {
+    const foundTeamName = await db.collection(leaderboardCollection).findOne({
+      teamName: teamName,
+    });
+    if (foundTeamName) {
+      return foundTeamName;
+    }
+    await db.collection(leaderboardCollection).insertOne({
+      teamName: teamName,
+      points: 0,
+      crates: 0,
+      finished: false,
+    });
+  } catch (error) {
+    throw new error("Error creating team");
+  }
+}
 
 const PORT = 5000;
 server.listen(PORT, () => {

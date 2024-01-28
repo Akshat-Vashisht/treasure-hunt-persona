@@ -17,7 +17,7 @@ const GameView = () => {
 
       // Get the initial timer value from the server
       axios
-        .get(`http://localhost:5000/api/timer?socketId=${socket.id}`)
+        .get(`http://localhost:5000/timer?socketId=${socket.id}`)
         .then((response) => {
           setTimer(response.data.timer);
 
