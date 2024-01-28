@@ -2,22 +2,10 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
+
 *,html{
   font-family: 'Poppins';
 }
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
-}
-
 
 input:-webkit-autofill,
 input:-webkit-autofill:hover,
@@ -27,7 +15,7 @@ input:-webkit-autofill:active {
     -webkit-text-fill-color: #fff !important;
 }
 .chest-image {
-  animation: show .2s cubic-bezier(0.215, 0.610, 0.355, 1) forwards;
+  animation: show .2s  cubic-bezier(0.215, 0.610, 0.355, 1) forwards;
 }
 @keyframes show {
   from{
@@ -39,3 +27,14 @@ input:-webkit-autofill:active {
     transform: scale(1);
   }
 }
+/* Disable text selection */
+.user-select-none {
+  user-select: none;
+  -moz-user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+}
+
+
+
+
