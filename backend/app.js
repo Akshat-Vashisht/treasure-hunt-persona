@@ -25,42 +25,53 @@ const io = socketIO(server, {
   },
 });
 
-let timerValue = 120; // Set the initial timer value to 2 minutes (2 * 60 seconds)
-let timerInterval;
+// Store user-specific timers
+const userTimers = {};
 
 io.on("connection", (socket) => {
   console.log("A user connected");
 
+  // Initialize user-specific timer
+  userTimers[socket.id] = {
+    value: 120, // Initial timer value in seconds
+    interval: null, // Timer interval reference
+  };
+
   // Send the initial timer value to the newly connected client
-  io.to(socket.id).emit("timer", formatTimer(timerValue));
+  io.to(socket.id).emit("timer", formatTimer(userTimers[socket.id].value));
 
   // Handle disconnection
   socket.on("disconnect", () => {
     console.log("User disconnected");
+    // Clear the user-specific timer interval on disconnection
+    clearInterval(userTimers[socket.id].interval);
+    delete userTimers[socket.id];
   });
 
   socket.on("startTimer", () => {
     console.log("Starting timer...");
 
-    // Clear the existing timer interval before starting a new one
-    clearInterval(timerInterval);
-    startTimer();
+    // Clear the existing user-specific timer interval before starting a new one
+    clearInterval(userTimers[socket.id].interval);
+
+    // Start the user-specific timer
+    startUserTimer(socket.id);
   });
 });
 
-// Start the timer on the server
-function startTimer() {
-  timerInterval = setInterval(() => {
-    if (timerValue > 0) {
-      timerValue--;
+// Start the user-specific timer on the server
+function startUserTimer(socketId) {
+  userTimers[socketId].interval = setInterval(() => {
+    if (userTimers[socketId].value > 0) {
+      userTimers[socketId].value--;
     }
-    const formattedTimer = formatTimer(timerValue);
+    const formattedTimer = formatTimer(userTimers[socketId].value);
 
     console.log(formattedTimer);
-    io.emit("timer", formattedTimer);
+    io.to(socketId).emit("timer", formattedTimer);
 
-    if (timerValue === 0) {
-      clearInterval(timerInterval);
+    if (userTimers[socketId].value === 0) {
+      clearInterval(userTimers[socketId].interval);
       console.log("Timer stopped");
     }
   }, 1000);
@@ -73,9 +84,16 @@ function formatTimer(timerValue) {
   return `${minutes}:${seconds}`;
 }
 
-// API endpoint to get the current timer value
+// API endpoint to get the current user-specific timer value
 app.get("/api/timer", (req, res) => {
-  res.json({ timer: formatTimer(timerValue) });
+  const socketId = req.query.socketId;
+  // console.log(userTimers);
+  // console.log(socketId);
+  if (userTimers[socketId]) {
+    res.json({ timer: formatTimer(userTimers[socketId].value) });
+  } else {
+    res.status(404).json({ error: "Timer not found for the specified user" });
+  }
 });
 
 app.post("/", (req, res) => {
