@@ -32,7 +32,7 @@ input:-webkit-autofill:active {
 @keyframes show {
   from{
     opacity: 0;
-    transform: scale(0.8)translateY(-20px);
+    transform: scale(0.8);
   }
   to{
     opacity: 100;
