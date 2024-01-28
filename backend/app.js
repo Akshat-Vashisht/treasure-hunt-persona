@@ -106,7 +106,7 @@ app.get("/timer", (req, res) => {
   }
 });
 
-app.get("/game", async (req, res) => {
+app.post("/game", async (req, res) => {
   try {
     const qId = req.body.qId;
     const userAnswer = req.body.userAnswer;
