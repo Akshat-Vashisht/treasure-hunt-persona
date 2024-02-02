@@ -1,79 +1,84 @@
 import React, { useEffect, useState } from "react";
 import Chest from "../Components/Chest";
 import { RxCross2 } from "react-icons/rx";
+import { FaArrowRight } from "react-icons/fa6";
+import axios from "axios";
+
 const GameQues = () => {
   const [openModal, setOpenModal] = useState({
     status: false,
     data: {},
   });
-  const questions = [
-    {
-      id: 1,
-      question:
-        "I speak without a mouth and hear without ears. I have no body, but I come alive with the wind. What am I?",
-      answer: "an echo",
-    },
-    {
-      id: 2,
-      question: "The more you take, the more you leave behind. What am I?",
-      answer: "footsteps",
-    },
-    {
-      id: 3,
-      question: "What has keys but can't open locks?",
-      answer: "a piano",
-    },
-    {
-      id: 4,
-      question:
-        "The person who makes it, sells it. The person who buys it never uses it. What is it?",
-      answer: "a coffin",
-    },
-    {
-      id: 5,
-      question:
-        "What comes once in a minute, twice in a moment, but never in a thousand years?",
-      answer: "the letter 'm'",
-    },
-    {
-      id: 6,
-      question:
-        "I am taken from a mine, and shut up in a wooden case, from which I am never released, and yet I am used by almost every person. What am I?",
-      answer: "pencil lead/graphite",
-    },
-    {
-      id: 7,
-      question:
-        "The more you look at me, the more you see. But the longer you stare, the less there is to see. What am I?",
-      answer: "darkness",
-    },
-    {
-      id: 8,
-      question:
-        "I fly without wings. I cry without eyes. Wherever I go, darkness follows me. What am I?",
-      answer: "a cloud",
-    },
-  ];
+  const [chestOpened, setChestOpened] = useState([]);
+  const [answer, setAnswer] = useState("");
+  const [isWrongAnswer, setisWrongAnswer] = useState(false);
+  async function fetchAllQuestions() {
+    try {
+      const res = await axios.get("http://localhost:5000/questions");
+      if (res.status == 200) {
+        console.log(res);
+        setChestOpened(
+          res.data.map((item) => {
+            return { ...item, isOpen: false, answer: "" };
+          })
+        );
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
   function closeModal() {
     setOpenModal({
       status: false,
       data: {},
     });
+    setAnswer("");
+    setisWrongAnswer(false);
   }
+  async function checkQuestion(data) {
+    //todo input check empty
+    try {
+      const res = await axios.post("http://localhost:5000/game", {
+        qId: data.id,
+        userAnswer: answer,
+      });
+      if (res.status === 200) {
+        console.log(res);
+        setChestOpened((prevChests) =>
+          prevChests.map((item) =>
+            item.id === data.id ? { ...item, isOpen: res.data.success } : item
+          )
+        );
+        setisWrongAnswer(!res.data.success);
+        if (res.data.success) {
+          const openChestAudio = new Audio("./assets/sounds/openChest.mp3");
+          openChestAudio.play();
+          closeModal();
+        }
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
   useEffect(() => {
+    console.log(chestOpened);
     console.log(openModal);
-  }, [openModal]);
+  }, [chestOpened]);
+
+  useEffect(() => {
+    fetchAllQuestions();
+  }, []);
 
   return (
     <>
-      {" "}
       <div className="py-8">
         <div className="h-fit mx-auto grid grid-cols-3 gap-4 gap-y-8 mt-8">
-          {questions.map((item, index) => {
+          {chestOpened.map((item, index) => {
             return (
               <Chest
-                index={index+1}
                 key={item.id}
+                index={index + 1}
                 data={item}
                 openModal={openModal}
                 setOpenModal={setOpenModal}
@@ -83,12 +88,35 @@ const GameQues = () => {
         </div>
       </div>
       {openModal.status && (
-        <div className="fixed top-0 right-0 z-40 h-screen reveal w-full bg-black bg-opacity-30 backdrop-blur-sm">
-          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-black w-[80vw] h-[50%] rounded-md">
+        <div className="fixed user-select-none top-0 right-0 z-40 h-screen reveal w-full bg-black bg-opacity-30 backdrop-blur-sm">
+          <div className="p-4 py-6 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-black w-[80vw] h-fit rounded-md">
             <RxCross2
               onClick={closeModal}
-              className="text-white rounded-full border border-white text-xl float-right m-2 cursor-pointer"
+              className="absolute top-1 -right-4 bg-black text-white rounded-full border border-white text-xl float-right m-2 cursor-pointer"
             />
+            <div className="flex flex-col gap-10">
+              <p className="text-[#639FB1] first-letter:text-2xl">
+                {openModal.data.question}
+              </p>
+              <div>
+              <input
+                placeholder="Type your answer"
+                type="text"
+                value={answer}
+                onChange={(event) =>{ setAnswer(event.target.value); setisWrongAnswer(false)}}
+                className={`bg-transparent text-slate-100 border ${
+                  isWrongAnswer ? "border-red-500 text-red-500" : "border-white"
+                }  py-1 px-2 w-full rounded-md focus:outline-none`}
+              />
+              {isWrongAnswer && <span className="text-xs text-red-500">Wrong answer!</span>}
+              </div>
+              <button
+                onClick={() => checkQuestion(openModal.data)}
+                className="text-slate-100 flex w-fit items-center gap-x-2 mx-auto"
+              >
+                Unlock Crate <FaArrowRight />
+              </button>
+            </div>
           </div>
         </div>
       )}
