@@ -9,11 +9,14 @@ app.use(express.json());
 const server = http.createServer(app);
 
 const { MongoClient } = require("mongodb");
+const { log } = require("console");
 const url = process.env.DB_URL;
 
 const dbName = "testDB";
 const questionsCollection = "questions";
 const leaderboardCollection = "leaderboard";
+// CHANGE TO 3600 once done
+const totalGameTime = 120;
 
 let db;
 
@@ -121,6 +124,23 @@ app.post("/game", async (req, res) => {
   }
 });
 
+app.post("/endgame", async (req, res) => {
+  const timer = req.body.timer;
+  const crates = req.body.crates;
+  const teamName = req.body.teamName;
+
+  try {
+    let strArr = timer.split(":");
+    let numArr = strArr.map((item) => +item);
+    let timeLeft = numArr[1] + 60 * numArr[0];
+    let timeTaken = totalGameTime - timeLeft;
+    const result = await updateScore(teamName, timeTaken, crates);
+    res.sendStatus(200);
+  } catch (err) {
+    res.status(500).json(err);
+  }
+});
+
 app.post("/", async (req, res) => {
   const adminPass = req.body.adminPass;
   const teamName = req.body.teamName;
@@ -147,6 +167,48 @@ app.get("/questions", async (req, res) => {
   }
 });
 
+app.get("/leaderboard", async (req, res) => {
+  try {
+    const result = await fetchLeaderboard();
+    res.status(200).json(result);
+  } catch (err) {
+    res.status(500).json(err);
+  }
+});
+
+async function fetchLeaderboard() {
+  try {
+    return db
+      .collection(leaderboardCollection)
+      .aggregate([
+        {
+          $sort: { crates: -1, timeTaken: 1 },
+        },
+      ])
+      .toArray();
+  } catch (err) {
+    return err;
+  }
+}
+
+async function updateScore(teamName, timeTaken, crates) {
+  try {
+    db.collection(leaderboardCollection).updateOne(
+      {
+        teamName: teamName,
+      },
+      {
+        $set: {
+          timeTaken: timeTaken,
+          crates: crates,
+        },
+      }
+    );
+  } catch (err) {
+    return err;
+  }
+}
+
 async function checkAnswer(qId) {
   try {
     const question = await db.collection(questionsCollection).findOne({
@@ -170,8 +232,7 @@ async function fetchTeamName(teamName) {
     await db.collection(leaderboardCollection).insertOne({
       teamName: teamName,
       timeTaken: 0,
-      cratesOpened: 0,
-      finished: false,
+      crates: 0,
     });
   } catch (error) {
     throw new error("Error creating team");
