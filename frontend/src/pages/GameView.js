@@ -32,7 +32,7 @@ const GameView = ({ teamName }) => {
       teamName : teamName 
     })
    if(res.status===200){
-    navigate('/endgame', {replace:true});
+    // navigate('/endgame', {replace:true});
    }
   }
   async function updateScore(){
