@@ -3,12 +3,15 @@ import { MdOutlineTimer } from "react-icons/md";
 import { io } from "socket.io-client";
 import axios from "axios";
 import GameQues from "./GameQues";
+import { useNavigate } from "react-router-dom";
 
 const GameView = ({ teamName }) => {
+  const navigate = useNavigate()
   const [timer, setTimer] = useState("02:00");
   const [socketId, setSocketId] = useState(null);
   const [chestOpened, setChestOpened] = useState([]);
 
+  
   function checkTimerStop() {
     let strArr = timer.split(":");
     let numArr = strArr.map((item) => +item);
@@ -28,9 +31,22 @@ const GameView = ({ teamName }) => {
       crates : cratesOpened,
       teamName : teamName 
     })
-    console.log(res);
+   if(res.status===200){
+    navigate('/endgame', {replace:true});
+   }
   }
-
+  async function updateScore(){
+    const cratesOpened = chestOpened.filter(item=>item.isOpen).length
+    const res = await axios.post('/endgame',{
+      timer : timer,
+      crates : cratesOpened,
+      teamName : teamName 
+    })
+    if(res.status===200){
+      console.log(res)
+      // navigate('/endgame', {replace:true});
+     }
+  }
   //Socket Io
   useEffect(() => {
     const socket = io("http://localhost:5000");
@@ -71,6 +87,8 @@ const GameView = ({ teamName }) => {
   useEffect(()=>{
     if(chestOpened.filter(item=>item.isOpen).length === 8){
       gameEnd();
+    }else{
+      updateScore();
     }
   },[chestOpened])
 
