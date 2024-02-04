@@ -9,16 +9,15 @@ app.use(express.json());
 const server = http.createServer(app);
 
 const { MongoClient } = require("mongodb");
-const { log } = require("console");
 const url = process.env.DB_URL;
 
 const dbName = "testDB";
 const questionsCollection = "questions";
 const leaderboardCollection = "leaderboard";
-// CHANGE TO 3600 once done
 const totalGameTime = 120;
 
 let db;
+let adminSocket = null;
 
 MongoClient.connect(url)
   .then((client) => {
@@ -29,7 +28,6 @@ MongoClient.connect(url)
     throw err;
   });
 
-// Enable CORS for all routes
 app.use(
   cors({
     origin: "*",
@@ -46,33 +44,61 @@ const io = socketIO(server, {
   },
 });
 
-// Store user-specific timers
 const userTimers = {};
 
 io.on("connection", (socket) => {
   console.log("A user connected");
 
-  userTimers[socket.id] = {
-    value: 120, // Initial timer value in seconds
-    interval: null, // Timer interval reference
-  };
+  if (socket.handshake.auth.role === "admin") {
+    adminSocket = socket;
+    console.log("Admin connected");
 
-  io.to(socket.id).emit("timer", formatTimer(userTimers[socket.id].value));
+    sendLeaderboardDataToAdmin();
+  } else {
+    userTimers[socket.id] = {
+      value: 120,
+      interval: null,
+    };
 
-  socket.on("disconnect", () => {
-    console.log("User disconnected");
-    clearInterval(userTimers[socket.id].interval);
-    delete userTimers[socket.id];
-  });
+    io.to(socket.id).emit("timer", formatTimer(userTimers[socket.id].value));
 
-  socket.on("startTimer", () => {
-    console.log("Starting timer...");
-    clearInterval(userTimers[socket.id].interval);
-    startUserTimer(socket.id);
-  });
+    socket.on("disconnect", () => {
+      console.log("User disconnected");
+      clearInterval(userTimers[socket.id].interval);
+      delete userTimers[socket.id];
+
+      sendLeaderboardDataToAdmin();
+    });
+
+    socket.on("startTimer", () => {
+      console.log("Starting timer...");
+      clearInterval(userTimers[socket.id].interval);
+      startUserTimer(socket.id);
+    });
+  }
 });
 
-// Start the user-specific timer on the server
+function sendLeaderboardDataToAdmin() {
+  if (adminSocket) {
+    fetchLeaderboardData()
+      .then((leaderboardData) => {
+        adminSocket.emit("leaderboardUpdate", leaderboardData);
+      })
+      .catch((error) => {
+        console.error("Error fetching leaderboard data:", error);
+      });
+  }
+}
+
+async function fetchLeaderboardData() {
+  try {
+    const leaderboardData = await fetchLeaderboard();
+    return leaderboardData;
+  } catch (err) {
+    throw err;
+  }
+}
+
 function startUserTimer(socketId) {
   userTimers[socketId].interval = setInterval(() => {
     if (userTimers[socketId].value > 0) {
@@ -90,18 +116,15 @@ function startUserTimer(socketId) {
   }, 1000);
 }
 
-// Format the timer value to "mm:ss"
 function formatTimer(timerValue) {
   const minutes = String(Math.floor(timerValue / 60)).padStart(2, "0");
   const seconds = String(timerValue % 60).padStart(2, "0");
   return `${minutes}:${seconds}`;
 }
 
-// API endpoint to get the current user-specific timer value
 app.get("/timer", (req, res) => {
   const socketId = req.query.socketId;
-  // console.log(userTimers);
-  // console.log(socketId);
+
   if (userTimers[socketId]) {
     res.json({ timer: formatTimer(userTimers[socketId].value) });
   } else {
@@ -144,10 +167,12 @@ app.post("/endgame", async (req, res) => {
 app.post("/", async (req, res) => {
   const adminPass = req.body.adminPass;
   const teamName = req.body.teamName;
+
   try {
     if (adminPass != process.env.ADMIN_PASS) {
       return res.status(401).json({ Description: "Unauthorized" });
     }
+
     const foundTeamName = await fetchTeamName(teamName);
     if (foundTeamName) {
       return res.status(409).json({ Description: "Team name already exists" });
@@ -155,6 +180,7 @@ app.post("/", async (req, res) => {
   } catch (err) {
     return res.status(500).json({ Description: err });
   }
+
   return res.status(200).json({ Description: "Authorized" });
 });
 
@@ -193,7 +219,7 @@ async function fetchLeaderboard() {
 
 async function updateScore(teamName, timeTaken, crates) {
   try {
-    db.collection(leaderboardCollection).updateOne(
+   const result = await db.collection(leaderboardCollection).updateOne(
       {
         teamName: teamName,
       },
@@ -202,8 +228,10 @@ async function updateScore(teamName, timeTaken, crates) {
           timeTaken: timeTaken,
           crates: crates,
         },
-      }  
+      }
     );
+      console.log(result);
+    sendLeaderboardDataToAdmin();
   } catch (err) {
     return err;
   }
@@ -235,7 +263,7 @@ async function fetchTeamName(teamName) {
       crates: 0,
     });
   } catch (error) {
-    throw new error("Error creating team");
+    throw new Error("Error creating team");
   }
 }
 
