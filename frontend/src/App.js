@@ -7,14 +7,16 @@ import Protected from "./pages/Protected";
 import GameView from "./pages/GameView";
 import Register from "./pages/Register";
 import GameQues from "./pages/GameQues";
+import { useState } from "react";
 
 function App() {
+  const [teamName, setTeamName] = useState("")
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<Register />} />
+        <Route path="/" element={<Register teamName={teamName} setTeamName={setTeamName}/>} />
         <Route path="/protected" element={<Protected />} />
-        <Route path="/game" element={<GameView />} />
+        <Route path="/game" element={<GameView teamName={teamName} />} />
         {/* <Route path="/game-ques" element={<GameQues />} /> */}
       </Routes>
     </Router>

@@ -4,10 +4,34 @@ import { io } from "socket.io-client";
 import axios from "axios";
 import GameQues from "./GameQues";
 
-const GameView = () => {
+const GameView = ({ teamName }) => {
   const [timer, setTimer] = useState("02:00");
   const [socketId, setSocketId] = useState(null);
+  const [chestOpened, setChestOpened] = useState([]);
 
+  function checkTimerStop() {
+    let strArr = timer.split(":");
+    let numArr = strArr.map((item) => +item);
+    return numArr.every((item) => item == 0);
+  }
+
+  async function gameEnd() {
+    /*
+      case 3 : user leave the site
+      case 2 : time stop
+      case 1 : all crates open
+      */
+    console.log("**Game end data sent");
+    const cratesOpened = chestOpened.filter(item=>item.isOpen).length
+    const res = await axios.post('/endgame',{
+      timer : timer,
+      crates : cratesOpened,
+      teamName : teamName 
+    })
+    console.log(res);
+  }
+
+  //Socket Io
   useEffect(() => {
     const socket = io("http://localhost:5000");
 
@@ -35,25 +59,37 @@ const GameView = () => {
       socket.disconnect();
     };
   }, []);
-  const handleBeforeUnload = (event) => {
-    const confirmationMessage = "Are you sure you want to leave?";
-    event.returnValue = confirmationMessage; // Standard for most browsers
-    return confirmationMessage; // For some older browsers
-  };
-  window.addEventListener("beforeunload", handleBeforeUnload);
 
-
-
-  function checkTimerStop() {
-    let strArr = timer.split(":");
-    let numArr = strArr.map((item) => +item);
-    // console.log(numArr);
-    // console.log(numArr.every((item) => item == 0));
-    return numArr.every((item) => item == 0);
-  }
+  //Timer stopped?
   useEffect(() => {
-    checkTimerStop();
+    if (checkTimerStop()) {
+      gameEnd();
+    }
   }, [timer]);
+
+  //All crates opened?
+  useEffect(()=>{
+    if(chestOpened.filter(item=>item.isOpen).length === 8){
+      gameEnd();
+    }
+  },[chestOpened])
+
+  //User disconnected?
+  useEffect(() => {
+    const handleBeforeUnload = (event) => {
+      gameEnd();
+      const confirmationMessage = "Are you sure you want to leave?";
+      event.returnValue = confirmationMessage;
+      return confirmationMessage;
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+
+    // Clean up the event listener when the component unmounts
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }, []);
 
 
   return (
@@ -73,7 +109,7 @@ const GameView = () => {
         Timer: {timer}
       </h1>
       <div className="mt-[10rem]">
-        <GameQues />
+        <GameQues chestOpened={chestOpened} setChestOpened={setChestOpened} />
       </div>
     </div>
   );

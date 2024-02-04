@@ -202,7 +202,7 @@ async function updateScore(teamName, timeTaken, crates) {
           timeTaken: timeTaken,
           crates: crates,
         },
-      }
+      }  
     );
   } catch (err) {
     return err;

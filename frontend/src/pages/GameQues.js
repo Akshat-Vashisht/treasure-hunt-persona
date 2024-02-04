@@ -4,12 +4,12 @@ import { RxCross2 } from "react-icons/rx";
 import { FaArrowRight } from "react-icons/fa6";
 import axios from "axios";
 
-const GameQues = () => {
+const GameQues = ({chestOpened, setChestOpened}) => {
   const [openModal, setOpenModal] = useState({
     status: false,
     data: {},
   });
-  const [chestOpened, setChestOpened] = useState([]);
+  // const [chestOpened, setChestOpened] = useState([]);
   const [answer, setAnswer] = useState("");
   const [isWrongAnswer, setisWrongAnswer] = useState(false);
   async function fetchAllQuestions() {

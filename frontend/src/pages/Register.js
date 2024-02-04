@@ -3,7 +3,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { FaArrowRight } from "react-icons/fa6";
 
-const Register = () => {
+const Register = ({teamName, setTeamName}) => {
   const navigate = useNavigate();
   const [data, setData] = useState({
     teamName: "",
@@ -23,6 +23,7 @@ const Register = () => {
       const res = await axios.post("http://localhost:5000/", newState);
       console.log(res);
       if (res.status === 200) {
+        setTeamName(teamName);
         navigate("/game");
       }
     } catch (error) {
