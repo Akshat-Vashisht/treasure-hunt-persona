@@ -47,11 +47,11 @@ const io = socketIO(server, {
 const userTimers = {};
 
 io.on("connection", (socket) => {
-  console.log("A user connected");
+  // console.log("A user connected");
 
   if (socket.handshake.auth.role === "admin") {
     adminSocket = socket;
-    console.log("Admin connected");
+    // console.log("Admin connected");
 
     sendLeaderboardDataToAdmin();
   } else {
@@ -63,7 +63,7 @@ io.on("connection", (socket) => {
     io.to(socket.id).emit("timer", formatTimer(userTimers[socket.id].value));
 
     socket.on("disconnect", () => {
-      console.log("User disconnected");
+      // console.log("User disconnected");
       clearInterval(userTimers[socket.id].interval);
       delete userTimers[socket.id];
 
@@ -71,7 +71,7 @@ io.on("connection", (socket) => {
     });
 
     socket.on("startTimer", () => {
-      console.log("Starting timer...");
+      // console.log("Starting timer...");
       clearInterval(userTimers[socket.id].interval);
       startUserTimer(socket.id);
     });
@@ -106,12 +106,12 @@ function startUserTimer(socketId) {
     }
     const formattedTimer = formatTimer(userTimers[socketId].value);
 
-    console.log(formattedTimer);
+    // console.log(formattedTimer);
     io.to(socketId).emit("timer", formattedTimer);
 
     if (userTimers[socketId].value === 0) {
       clearInterval(userTimers[socketId].interval);
-      console.log("Timer stopped");
+      // console.log("Timer stopped");
     }
   }, 1000);
 }
@@ -230,7 +230,6 @@ async function updateScore(teamName, timeTaken, crates) {
         },
       }
     );
-      console.log(result);
     sendLeaderboardDataToAdmin();
   } catch (err) {
     return err;
@@ -249,7 +248,7 @@ async function checkAnswer(qId) {
 }
 
 async function fetchTeamName(teamName) {
-  teamName = teamName.toLowerCase();
+  teamName = teamName;
   try {
     const foundTeamName = await db.collection(leaderboardCollection).findOne({
       teamName: teamName,
