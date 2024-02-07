@@ -6,12 +6,11 @@ import GameQues from "./GameQues";
 import { useNavigate } from "react-router-dom";
 
 const GameView = ({ teamName }) => {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   const [timer, setTimer] = useState("02:00");
   const [socketId, setSocketId] = useState(null);
   const [chestOpened, setChestOpened] = useState([]);
 
-  
   function checkTimerStop() {
     let strArr = timer.split(":");
     let numArr = strArr.map((item) => +item);
@@ -25,31 +24,32 @@ const GameView = ({ teamName }) => {
       case 1 : all crates open
       */
     console.log("**Game end data sent");
-    const cratesOpened = chestOpened.filter(item=>item.isOpen).length
-    const res = await axios.post('http://localhost:5000/endgame',{
-      timer : timer,
-      crates : cratesOpened,
-      teamName : teamName 
-    })
-   if(res.status===200){
-    navigate('/endgame', {replace:true});
-   }
+    const cratesOpened = chestOpened.filter((item) => item.isOpen).length;
+    const res = await axios.post("https://treasure-hunt-mit.onrender.com/endgame", {
+      timer: timer,
+      crates: cratesOpened,
+      teamName: teamName,
+    });
+    if (res.status === 200) {
+      navigate("/endgame", { replace: true });
+    }
   }
-  async function updateScore(){
-    const cratesOpened = chestOpened.filter(item=>item.isOpen).length
-    const res = await axios.post('http://localhost:5000/endgame',{
-      timer : timer,
-      crates : cratesOpened,
-      teamName : teamName 
-    })
-    if(res.status===200){
-      console.log(res)
+  
+  async function updateScore() {
+    const cratesOpened = chestOpened.filter((item) => item.isOpen).length;
+    const res = await axios.post("https://treasure-hunt-mit.onrender.com/endgame", {
+      timer: timer,
+      crates: cratesOpened,
+      teamName: teamName,
+    });
+    if (res.status === 200) {
+      console.log(res);
       // navigate('/endgame', {replace:true});
-     }
+    }
   }
   //Socket Io
   useEffect(() => {
-    const socket = io("http://localhost:5000");
+    const socket = io("https://treasure-hunt-mit.onrender.com");
 
     // Get the socket ID once the connection is established
     socket.on("connect", () => {
@@ -57,7 +57,7 @@ const GameView = ({ teamName }) => {
 
       // Get the initial timer value from the server
       axios
-        .get(`http://localhost:5000/timer?socketId=${socket.id}`)
+        .get(`https://treasure-hunt-mit.onrender.com/timer?socketId=${socket.id}`)
         .then((response) => {
           setTimer(response.data.timer);
 
@@ -84,19 +84,19 @@ const GameView = ({ teamName }) => {
   }, [timer]);
 
   //All crates opened?
-  useEffect(()=>{
-    if(chestOpened.filter(item=>item.isOpen).length === 8){
+  useEffect(() => {
+    if (chestOpened.filter((item) => item.isOpen).length === 8) {
       gameEnd();
-    }else{
+    } else {
       updateScore();
     }
-  },[chestOpened])
+  }, [chestOpened]);
 
-  useEffect(()=>{
-    if(!teamName){
-      navigate('/',{replace:true});
+  useEffect(() => {
+    if (!teamName) {
+      navigate("/", { replace: true });
     }
-  },[teamName])
+  }, [teamName]);
 
   // User disconnected?
   useEffect(() => {
@@ -114,7 +114,6 @@ const GameView = ({ teamName }) => {
       window.removeEventListener("beforeunload", handleBeforeUnload);
     };
   }, [timer, chestOpened, teamName]);
-
 
   return (
     <div className="">

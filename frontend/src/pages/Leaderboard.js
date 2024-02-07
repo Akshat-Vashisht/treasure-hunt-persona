@@ -5,7 +5,7 @@ const Leaderboard = () => {
   const [leaderboard, setLeaderboard] = useState([]);
 
   useEffect(() => {
-    const socket = io("http://localhost:5000", {
+    const socket = io("https://treasure-hunt-mit.onrender.com", {
       auth: {
         role: "admin",
       },
