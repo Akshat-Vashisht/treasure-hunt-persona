@@ -11,6 +11,7 @@ const GameQues = ({chestOpened, setChestOpened}) => {
   });
   // const [chestOpened, setChestOpened] = useState([]);
   const [answer, setAnswer] = useState("");
+  const [currentChestId, setCurrentChestId] = useState(1); // current Id - the chest which should be open now!
   const [isWrongAnswer, setisWrongAnswer] = useState(false);
   async function fetchAllQuestions() {
     try {
@@ -19,7 +20,7 @@ const GameQues = ({chestOpened, setChestOpened}) => {
         console.log(res);
         setChestOpened(
           res.data.map((item) => {
-            return { ...item, isOpen: false, answer: "" };
+            return { ...item, isOpen: false, answer: "",clickable:false };
           })
         );
       }
@@ -51,6 +52,7 @@ const GameQues = ({chestOpened, setChestOpened}) => {
         );
         setisWrongAnswer(!res.data.success);
         if (res.data.success) {
+          setCurrentChestId(prev=>++prev)
           const openChestAudio = new Audio("./assets/sounds/openChest.mp3");
           openChestAudio.play();
           closeModal();
@@ -80,6 +82,7 @@ const GameQues = ({chestOpened, setChestOpened}) => {
                 key={item.id}
                 index={index + 1}
                 data={item}
+                currentChestId={currentChestId}
                 openModal={openModal}
                 setOpenModal={setOpenModal}
               />

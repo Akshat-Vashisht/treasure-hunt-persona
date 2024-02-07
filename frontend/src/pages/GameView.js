@@ -26,18 +26,18 @@ const GameView = ({ teamName }) => {
       */
     console.log("**Game end data sent");
     const cratesOpened = chestOpened.filter(item=>item.isOpen).length
-    const res = await axios.post('/endgame',{
+    const res = await axios.post('http://localhost:5000/endgame',{
       timer : timer,
       crates : cratesOpened,
       teamName : teamName 
     })
    if(res.status===200){
-    // navigate('/endgame', {replace:true});
+    navigate('/endgame', {replace:true});
    }
   }
   async function updateScore(){
     const cratesOpened = chestOpened.filter(item=>item.isOpen).length
-    const res = await axios.post('/endgame',{
+    const res = await axios.post('http://localhost:5000/endgame',{
       timer : timer,
       crates : cratesOpened,
       teamName : teamName 
@@ -92,7 +92,13 @@ const GameView = ({ teamName }) => {
     }
   },[chestOpened])
 
-  //User disconnected?
+  useEffect(()=>{
+    if(!teamName){
+      navigate('/',{replace:true});
+    }
+  },[teamName])
+
+  // User disconnected?
   useEffect(() => {
     const handleBeforeUnload = (event) => {
       gameEnd();
@@ -107,7 +113,7 @@ const GameView = ({ teamName }) => {
     return () => {
       window.removeEventListener("beforeunload", handleBeforeUnload);
     };
-  }, []);
+  }, [timer, chestOpened, teamName]);
 
 
   return (

@@ -35,6 +35,20 @@ input:-webkit-autofill:active {
   -ms-user-select: none;
 }
 
+.glow{
+  filter: drop-shadow(0 0 5px rgb(255, 255, 255)) drop-shadow(0 0 8px rgb(194, 207, 18)); 
+  animation: blink 3s ease-out infinite; 
+}
+@keyframes blink {
+  0%,100% {
+  filter: drop-shadow(0 0 5px rgb(255, 255, 255))
+   drop-shadow(0 0 8px rgb(238, 255, 0)); 
 
-
+  }
+  50%{
+    filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.116))
+    drop-shadow(0 0 8px rgba(236, 253, 0, 0.151)); 
+   
+  }
+}
 
