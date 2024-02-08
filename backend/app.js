@@ -187,6 +187,7 @@ app.post("/", async (req, res) => {
 app.get("/questions", async (req, res) => {
   try {
     const questions = await fetchQuestions();
+    console.log(questions);
     res.status(200).json(questions);
   } catch (err) {
     res.status(500).json(err);
@@ -270,7 +271,10 @@ async function fetchQuestions() {
   try {
     const questions = await db
       .collection(questionsCollection)
-      .find({}, { projection: { _id: 0, id: 1, question: 1 } })
+      .aggregate([
+        {$project: {_id: 0, id: 1, question: 1}},
+        {$sample: {size: 8}}
+      ])
       .toArray();
     return questions;
   } catch (err) {

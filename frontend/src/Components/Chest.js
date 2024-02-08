@@ -4,7 +4,7 @@ const Chest = ({ data, openModal, setOpenModal, index, currentChestId }) => {
   const [openChest, setOpenChest] = useState(false);
 
   function onChestClick(data) {
-    if (data.id === currentChestId) {
+    if (index === currentChestId) {
       if (!data.isOpen) {
         const openChestAudio = new Audio("./assets/sounds/questionAppear.mp3");
         openChestAudio.play();
@@ -31,7 +31,7 @@ const Chest = ({ data, openModal, setOpenModal, index, currentChestId }) => {
       <img
         draggable={false}
         onClick={() => onChestClick(data)}
-        className={`w-[7rem] transition-all duration-200 cursor-pointer mx-auto ${data.id === currentChestId ? "glow" : ""} ${
+        className={`w-[7rem] transition-all duration-200 cursor-pointer mx-auto ${index === currentChestId ? "glow" : ""} ${
           data.isOpen ? "chest-image" : ""
         }`}
         src={`./assets/${data.isOpen ? "open" : "close"}Chest.png`}

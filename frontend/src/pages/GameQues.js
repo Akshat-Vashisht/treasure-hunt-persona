@@ -15,7 +15,7 @@ const GameQues = ({chestOpened, setChestOpened}) => {
   const [isWrongAnswer, setisWrongAnswer] = useState(false);
   async function fetchAllQuestions() {
     try {
-      const res = await axios.get("https://treasure-hunt-mit.onrender.com/questions");
+      const res = await axios.get("http://localhost:5000/questions");
       if (res.status == 200) {
         console.log(res);
         setChestOpened(
@@ -39,7 +39,7 @@ const GameQues = ({chestOpened, setChestOpened}) => {
   async function checkQuestion(data) {
     //todo input check empty
     try {
-      const res = await axios.post("https://treasure-hunt-mit.onrender.com/game", {
+      const res = await axios.post("http://localhost:5000/game", {
         qId: data.id,
         userAnswer: answer,
       });
