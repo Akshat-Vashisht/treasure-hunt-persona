@@ -187,7 +187,6 @@ app.post("/", async (req, res) => {
 app.get("/questions", async (req, res) => {
   try {
     const questions = await fetchQuestions();
-    console.log(questions);
     res.status(200).json(questions);
   } catch (err) {
     res.status(500).json(err);
@@ -220,7 +219,7 @@ async function fetchLeaderboard() {
 
 async function updateScore(teamName, timeTaken, crates) {
   try {
-   const result = await db.collection(leaderboardCollection).updateOne(
+    const result = await db.collection(leaderboardCollection).updateOne(
       {
         teamName: teamName,
       },
@@ -272,8 +271,8 @@ async function fetchQuestions() {
     const questions = await db
       .collection(questionsCollection)
       .aggregate([
-        {$project: {_id: 0, id: 1, question: 1}},
-        {$sample: {size: 8}}
+        { $project: { _id: 0, id: 1, question: 1 } },
+        { $sample: { size: 8 } },
       ])
       .toArray();
     return questions;
@@ -286,3 +285,4 @@ const PORT = 5000;
 server.listen(PORT, () => {
   console.log(`Socket.IO server is running on port ${PORT}`);
 });
+
