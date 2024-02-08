@@ -1,16 +1,12 @@
 const express = require("express");
-const https = require("https");
+const http = require("http");
 const socketIO = require("socket.io");
 const cors = require("cors");
 require("dotenv").config();
 
 const app = express();
 app.use(express.json());
-const options = { 
-  key: fs.readFileSync("server.key"), 
-  cert: fs.readFileSync("server.cert"), 
-}; 
-const server = https.createServer(options, app);
+const server = http.createServer(options, app);
 
 const { MongoClient } = require("mongodb");
 const url = process.env.DB_URL;
