@@ -6,7 +6,7 @@ require("dotenv").config();
 
 const app = express();
 app.use(express.json());
-const server = http.createServer(options, app);
+const server = http.createServer(app);
 
 const { MongoClient } = require("mongodb");
 const url = process.env.DB_URL;
