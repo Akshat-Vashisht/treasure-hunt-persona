@@ -25,7 +25,7 @@ const GameView = ({ teamName }) => {
       */
     console.log("**Game end data sent");
     const cratesOpened = chestOpened.filter((item) => item.isOpen).length;
-    const res = await axios.post("http://15.206.164.121:5000/endgame", {
+    const res = await axios.post("https://15.206.164.121:5000//endgame", {
       timer: timer,
       crates: cratesOpened,
       teamName: teamName,
@@ -37,7 +37,7 @@ const GameView = ({ teamName }) => {
   
   async function updateScore() {
     const cratesOpened = chestOpened.filter((item) => item.isOpen).length;
-    const res = await axios.post("http://15.206.164.121:5000/endgame", {
+    const res = await axios.post("https://15.206.164.121:5000//endgame", {
       timer: timer,
       crates: cratesOpened,
       teamName: teamName,
@@ -49,7 +49,7 @@ const GameView = ({ teamName }) => {
   }
   //Socket Io
   useEffect(() => {
-    const socket = io("http://15.206.164.121:5000/");
+    const socket = io("https://15.206.164.121:5000//");
 
     // Get the socket ID once the connection is established
     socket.on("connect", () => {
@@ -57,7 +57,7 @@ const GameView = ({ teamName }) => {
 
       // Get the initial timer value from the server
       axios
-        .get(`http://15.206.164.121:5000/timer?socketId=${socket.id}`)
+        .get(`https://15.206.164.121:5000//timer?socketId=${socket.id}`)
         .then((response) => {
           setTimer(response.data.timer);
 
