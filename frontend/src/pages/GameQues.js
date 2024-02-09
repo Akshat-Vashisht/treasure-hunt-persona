@@ -4,7 +4,7 @@ import { RxCross2 } from "react-icons/rx";
 import { FaArrowRight } from "react-icons/fa6";
 import axios from "axios";
 
-const GameQues = ({chestOpened, setChestOpened}) => {
+const GameQues = ({chestOpened, setChestOpened, timer, updateScore}) => {
   const [openModal, setOpenModal] = useState({
     status: false,
     data: {},
@@ -55,6 +55,7 @@ const GameQues = ({chestOpened, setChestOpened}) => {
           setCurrentChestId(prev=>++prev)
           const openChestAudio = new Audio("./assets/sounds/openChest.mp3");
           openChestAudio.play();
+          updateScore(timer)
           closeModal();
         }
       }

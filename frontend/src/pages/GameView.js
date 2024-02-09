@@ -10,6 +10,8 @@ const GameView = ({ teamName }) => {
   const [timer, setTimer] = useState("02:00");
   const [socketId, setSocketId] = useState(null);
   const [chestOpened, setChestOpened] = useState([]);
+  const [confirmUnload, setConfirmUnload] = useState(false);
+
 
   function checkTimerStop() {
     let strArr = timer.split(":");
@@ -34,8 +36,9 @@ const GameView = ({ teamName }) => {
       navigate("/endgame", { replace: true });
     }
   }
-  
-  async function updateScore() {
+
+  async function updateScore(timer) {
+    console.log("asdadasda")
     const cratesOpened = chestOpened.filter((item) => item.isOpen).length;
     const res = await axios.post("http://localhost:5000/endgame", {
       timer: timer,
@@ -79,6 +82,7 @@ const GameView = ({ teamName }) => {
   //Timer stopped?
   useEffect(() => {
     if (checkTimerStop()) {
+      console.log("load 1")
       gameEnd();
     }
   }, [timer]);
@@ -86,9 +90,8 @@ const GameView = ({ teamName }) => {
   //All crates opened?
   useEffect(() => {
     if (chestOpened.filter((item) => item.isOpen).length === 8) {
+      console.log("load 2")
       gameEnd();
-    } else {
-      updateScore();
     }
   }, [chestOpened]);
 
@@ -101,19 +104,37 @@ const GameView = ({ teamName }) => {
   // User disconnected?
   useEffect(() => {
     const handleBeforeUnload = (event) => {
-      gameEnd();
-      const confirmationMessage = "Are you sure you want to leave?";
-      event.returnValue = confirmationMessage;
-      return confirmationMessage;
+      // Only set a confirmation message if confirmUnload is false
+      if (!confirmUnload) {
+        const confirmationMessage = "Are you sure you want to leave?";
+        event.returnValue = confirmationMessage;
+      } else {
+        // If confirmUnload is true (user chose to reload), execute gameEnd
+      console.log("load 4")
+        gameEnd();
+      }
     };
 
     window.addEventListener("beforeunload", handleBeforeUnload);
 
-    // Clean up the event listener when the component unmounts
     return () => {
       window.removeEventListener("beforeunload", handleBeforeUnload);
     };
-  }, [timer, chestOpened, teamName]);
+  }, [confirmUnload]);
+
+  // Modify the existing useEffect for handling page reloads
+  useEffect(() => {
+    const handleUnload = () => {
+      // Set confirmUnload to true when the page is reloaded
+      setConfirmUnload(true);
+    };
+
+    window.addEventListener("unload", handleUnload);
+
+    return () => {
+      window.removeEventListener("unload", handleUnload);
+    };
+  }, []);
 
   return (
     <div className="">
@@ -132,7 +153,7 @@ const GameView = ({ teamName }) => {
         Timer: {timer}
       </h1>
       <div className="mt-[10rem]">
-        <GameQues chestOpened={chestOpened} setChestOpened={setChestOpened} />
+        <GameQues timer={timer} updateScore={updateScore} chestOpened={chestOpened} setChestOpened={setChestOpened} />
       </div>
     </div>
   );
