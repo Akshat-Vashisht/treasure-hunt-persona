@@ -15,7 +15,7 @@ const GameQues = ({chestOpened, setChestOpened, timer, updateScore}) => {
   const [isWrongAnswer, setisWrongAnswer] = useState(false);
   async function fetchAllQuestions() {
     try {
-      const res = await axios.get("http://3.6.40.164:5000/questions");
+      const res = await axios.get("https://treasure-hunt-persona-api.vercel.app/questions");
       if (res.status == 200) {
         console.log(res);
         setChestOpened(
@@ -39,7 +39,7 @@ const GameQues = ({chestOpened, setChestOpened, timer, updateScore}) => {
   async function checkQuestion(data) {
     //todo input check empty
     try {
-      const res = await axios.post("http://3.6.40.164:5000/game", {
+      const res = await axios.post("https://treasure-hunt-persona-api.vercel.app/game", {
         qId: data.id,
         userAnswer: answer,
       });

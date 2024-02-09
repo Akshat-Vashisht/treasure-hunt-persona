@@ -28,7 +28,7 @@ const Register = ({ teamName, setTeamName }) => {
     console.log(newState);
     if (checkFields()) {
       try {
-        const res = await axios.post("http://3.6.40.164:5000/", newState);
+        const res = await axios.post("https://treasure-hunt-persona-api.vercel.app/", newState);
         console.log(res);
         if (res.status === 200) {
           setTeamName(teamName);

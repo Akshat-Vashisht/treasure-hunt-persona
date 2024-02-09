@@ -6,7 +6,7 @@ const Leaderboard = () => {
   const [leaderboard, setLeaderboard] = useState([]);
 
   useEffect(() => {
-    const socket = io("http://3.6.40.164:5000/", {
+    const socket = io("https://treasure-hunt-persona-api.vercel.app/", {
       auth: {
         role: "admin",
       },

@@ -27,7 +27,7 @@ const GameView = ({ teamName }) => {
       */
     console.log("**Game end data sent");
     const cratesOpened = chestOpened.filter((item) => item.isOpen).length;
-    const res = await axios.post("http://3.6.40.164:5000/endgame", {
+    const res = await axios.post("https://treasure-hunt-persona-api.vercel.app/endgame", {
       timer: timer,
       crates: cratesOpened,
       teamName: teamName,
@@ -40,7 +40,7 @@ const GameView = ({ teamName }) => {
   async function updateScore(timer) {
     console.log("asdadasda")
     const cratesOpened = chestOpened.filter((item) => item.isOpen).length;
-    const res = await axios.post("http://3.6.40.164:5000/endgame", {
+    const res = await axios.post("https://treasure-hunt-persona-api.vercel.app/endgame", {
       timer: timer,
       crates: cratesOpened,
       teamName: teamName,
@@ -52,7 +52,7 @@ const GameView = ({ teamName }) => {
   }
   //Socket Io
   useEffect(() => {
-    const socket = io("http://3.6.40.164:5000/");
+    const socket = io("https://treasure-hunt-persona-api.vercel.app/");
 
     // Get the socket ID once the connection is established
     socket.on("connect", () => {
@@ -60,7 +60,7 @@ const GameView = ({ teamName }) => {
 
       // Get the initial timer value from the server
       axios
-        .get(`http://3.6.40.164:5000/timer?socketId=${socket.id}`)
+        .get(`https://treasure-hunt-persona-api.vercel.app/timer?socketId=${socket.id}`)
         .then((response) => {
           setTimer(response.data.timer);
 
