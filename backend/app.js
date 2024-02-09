@@ -134,6 +134,10 @@ function formatTimer(timerValue) {
   return `${minutes}:${seconds}`;
 }
 
+app.get("/", (req, res) => {
+  res.json("Hello");
+});
+
 app.get("/timer", (req, res) => {
   const socketId = req.query.socketId;
 
