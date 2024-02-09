@@ -6,7 +6,7 @@ const Leaderboard = () => {
   const [leaderboard, setLeaderboard] = useState([]);
 
   useEffect(() => {
-    const socket = io("http://65.1.147.240:5000/", {
+    const socket = io("http://3.6.40.164:5000/", {
       auth: {
         role: "admin",
       },
