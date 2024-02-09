@@ -12,7 +12,6 @@ const GameView = ({ teamName }) => {
   const [chestOpened, setChestOpened] = useState([]);
   const [confirmUnload, setConfirmUnload] = useState(false);
 
-
   function checkTimerStop() {
     let strArr = timer.split(":");
     let numArr = strArr.map((item) => +item);
@@ -27,20 +26,24 @@ const GameView = ({ teamName }) => {
       */
     console.log("**Game end data sent");
     const cratesOpened = chestOpened.filter((item) => item.isOpen).length;
-    const res = await axios.post("http://65.1.147.240:5000/endgame", {
+    const res = await axios.post("http://localhost:5000/endgame", {
       timer: timer,
       crates: cratesOpened,
       teamName: teamName,
     });
     if (res.status === 200) {
-      navigate("/endgame", { replace: true });
+      navigate("/endgame", { replace: true,
+        state: {
+          cratesOpened: cratesOpened,
+          timer: timer,
+          teamName: teamName
+        } });
     }
   }
 
-  async function updateScore(timer) {
-    console.log("asdadasda")
+  async function updateScore() {
     const cratesOpened = chestOpened.filter((item) => item.isOpen).length;
-    const res = await axios.post("http://65.1.147.240:5000/endgame", {
+    const res = await axios.post("http://localhost:5000/endgame", {
       timer: timer,
       crates: cratesOpened,
       teamName: teamName,
@@ -52,7 +55,7 @@ const GameView = ({ teamName }) => {
   }
   //Socket Io
   useEffect(() => {
-    const socket = io("http://65.1.147.240:5000/");
+    const socket = io("http://localhost:5000/");
 
     // Get the socket ID once the connection is established
     socket.on("connect", () => {
@@ -60,7 +63,7 @@ const GameView = ({ teamName }) => {
 
       // Get the initial timer value from the server
       axios
-        .get(`http://65.1.147.240:5000/timer?socketId=${socket.id}`)
+        .get(`http://localhost:5000/timer?socketId=${socket.id}`)
         .then((response) => {
           setTimer(response.data.timer);
 
@@ -79,10 +82,10 @@ const GameView = ({ teamName }) => {
     };
   }, []);
 
-  //Timer stopped?
+  // Timer stopped?
   useEffect(() => {
     if (checkTimerStop()) {
-      console.log("load 1")
+      console.log("load 1");
       gameEnd();
     }
   }, [timer]);
@@ -90,8 +93,17 @@ const GameView = ({ teamName }) => {
   //All crates opened?
   useEffect(() => {
     if (chestOpened.filter((item) => item.isOpen).length === 8) {
-      console.log("load 2")
+      console.log("load 2");
       gameEnd();
+    }
+  }, [chestOpened]);
+
+  //All crates opened?
+  useEffect(() => {
+    if (chestOpened.filter((item) => item.isOpen).length === 8) {
+      gameEnd();
+    } else {
+      updateScore();
     }
   }, [chestOpened]);
 
@@ -104,58 +116,48 @@ const GameView = ({ teamName }) => {
   // User disconnected?
   useEffect(() => {
     const handleBeforeUnload = (event) => {
-      // Only set a confirmation message if confirmUnload is false
-      if (!confirmUnload) {
-        const confirmationMessage = "Are you sure you want to leave?";
-        event.returnValue = confirmationMessage;
-      } else {
-        // If confirmUnload is true (user chose to reload), execute gameEnd
-      console.log("load 4")
-        gameEnd();
-      }
+      updateScore();
+      const confirmationMessage = "Are you sure you want to leave?";
+      event.returnValue = confirmationMessage;
+      return confirmationMessage;
     };
 
     window.addEventListener("beforeunload", handleBeforeUnload);
 
+    // Clean up the event listener when the component unmounts
     return () => {
       window.removeEventListener("beforeunload", handleBeforeUnload);
     };
-  }, [confirmUnload]);
-
-  // Modify the existing useEffect for handling page reloads
-  useEffect(() => {
-    const handleUnload = () => {
-      // Set confirmUnload to true when the page is reloaded
-      setConfirmUnload(true);
-    };
-
-    window.addEventListener("unload", handleUnload);
-
-    return () => {
-      window.removeEventListener("unload", handleUnload);
-    };
-  }, []);
+  }, [timer, chestOpened, teamName]);
 
   return (
-    <div className="">
-      {" "}
-      <div
-        style={{
-          background: "url(./assets/game-bg.png)",
-          backgroundSize: "cover",
-        }}
-        className="h-[30vh] w-full absolute top-0 z-10 "
-      >
-        <span className=" bg-[#151F21] h-[6rem] blur-lg opacity-40 -bottom-10 w-full absolute"></span>
+    <>
+      <div className="absolute flex flex-col justify-center items-center w-[8rem] top-0 left-2">
+        <img src="./assets/register-bg.png" alt="Treasure hunt logo" />
+        <img
+          className="-mt-10"
+          src="./assets/treasurehunt-txt.svg"
+          alt="Treasure hunt text"
+        />
       </div>
-      <h1 className="absolute z-50 bg-black text-white right-0 top-4 p-2 min-w-[9rem] rounded-s-md flex items-center gap-x-1">
-        <MdOutlineTimer />
-        Timer: {timer}
-      </h1>
-      <div className="mt-[10rem]">
-        <GameQues timer={timer} updateScore={updateScore} chestOpened={chestOpened} setChestOpened={setChestOpened} />
+      <div className="h-screen flex flex-col items-center justify-center">
+        <h1 className="absolute z-50 bg-black text-white right-0 top-4 p-2 min-w-[9rem] rounded-s-md flex items-center gap-x-1">
+          <MdOutlineTimer />
+          Timer: {timer}
+        </h1>
+        <div className="w-full mt-12">
+          <p className="text-white text-lg font-semibold text-center">
+            Crates Opened : {chestOpened.filter((item) => item.isOpen).length}/8
+          </p>
+          <GameQues
+            timer={timer}
+            updateScore={updateScore}
+            chestOpened={chestOpened}
+            setChestOpened={setChestOpened}
+          />
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 
