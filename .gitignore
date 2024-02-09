@@ -16,3 +16,6 @@ benchmarks/graphs
 frontend/node_modules
 frontend/package-lock.json
 .env
+
+server.cert
+server.key

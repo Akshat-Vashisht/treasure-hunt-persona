@@ -28,7 +28,7 @@ const Register = ({ teamName, setTeamName }) => {
     console.log(newState);
     if (checkFields()) {
       try {
-        const res = await axios.post("http://localhost:5000/", newState);
+        const res = await axios.post("http://65.1.147.240:5000/", newState);
         console.log(res);
         if (res.status === 200) {
           setTeamName(teamName);
