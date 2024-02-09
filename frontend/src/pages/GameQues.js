@@ -4,7 +4,7 @@ import { RxCross2 } from "react-icons/rx";
 import { FaArrowRight } from "react-icons/fa6";
 import axios from "axios";
 
-const GameQues = ({chestOpened, setChestOpened, timer, updateScore}) => {
+const GameQues = ({ chestOpened, setChestOpened }) => {
   const [openModal, setOpenModal] = useState({
     status: false,
     data: {},
@@ -15,12 +15,12 @@ const GameQues = ({chestOpened, setChestOpened, timer, updateScore}) => {
   const [isWrongAnswer, setisWrongAnswer] = useState(false);
   async function fetchAllQuestions() {
     try {
-      const res = await axios.get("http://65.1.147.240:5000/questions");
+      const res = await axios.get("http://localhost:5000/questions");
       if (res.status == 200) {
         console.log(res);
         setChestOpened(
           res.data.map((item) => {
-            return { ...item, isOpen: false, answer: "",clickable:false };
+            return { ...item, isOpen: false, answer: "", clickable: false };
           })
         );
       }
@@ -39,7 +39,7 @@ const GameQues = ({chestOpened, setChestOpened, timer, updateScore}) => {
   async function checkQuestion(data) {
     //todo input check empty
     try {
-      const res = await axios.post("http://65.1.147.240:5000/game", {
+      const res = await axios.post("http://localhost:5000/game", {
         qId: data.id,
         userAnswer: answer,
       });
@@ -52,10 +52,9 @@ const GameQues = ({chestOpened, setChestOpened, timer, updateScore}) => {
         );
         setisWrongAnswer(!res.data.success);
         if (res.data.success) {
-          setCurrentChestId(prev=>++prev)
+          setCurrentChestId((prev) => ++prev);
           const openChestAudio = new Audio("./assets/sounds/openChest.mp3");
           openChestAudio.play();
-          updateScore(timer)
           closeModal();
         }
       }
@@ -103,16 +102,23 @@ const GameQues = ({chestOpened, setChestOpened, timer, updateScore}) => {
                 {openModal.data.question}
               </p>
               <div>
-              <input
-                placeholder="Type your answer"
-                type="text"
-                value={answer}
-                onChange={(event) =>{ setAnswer(event.target.value); setisWrongAnswer(false)}}
-                className={`bg-transparent text-slate-100 border ${
-                  isWrongAnswer ? "border-red-500 text-red-500" : "border-white"
-                }  py-1 px-2 w-full rounded-md focus:outline-none`}
-              />
-              {isWrongAnswer && <span className="text-xs text-red-500">Wrong answer!</span>}
+                <input
+                  placeholder="Type your answer"
+                  type="text"
+                  value={answer}
+                  onChange={(event) => {
+                    setAnswer(event.target.value);
+                    setisWrongAnswer(false);
+                  }}
+                  className={`bg-transparent text-slate-100 border ${
+                    isWrongAnswer
+                      ? "border-red-500 text-red-500"
+                      : "border-white"
+                  }  py-1 px-2 w-full rounded-md focus:outline-none`}
+                />
+                {isWrongAnswer && (
+                  <span className="text-xs text-red-500">Wrong answer!</span>
+                )}
               </div>
               <button
                 onClick={() => checkQuestion(openModal.data)}
