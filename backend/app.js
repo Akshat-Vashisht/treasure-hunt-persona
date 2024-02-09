@@ -2,14 +2,11 @@ const express = require("express");
 const http = require("http");
 const socketIO = require("socket.io");
 const cors = require("cors");
-const path = require("path");
 require("dotenv").config();
 
-const buildPath = path.join(__dirname, "../frontend/build");
 
 const app = express();
 app.use(express.json());
-app.use(express.static(buildPath));
 const server = http.createServer(app);
 
 const { MongoClient } = require("mongodb");
@@ -49,14 +46,6 @@ const io = socketIO(server, {
 });
 
 const userTimers = {};
-
-app.get("/*", (req, res) => {
-  res.sendFile(path.join("../frontend/build/index.html"), function (err) {
-    if (err) {
-      res.status(500).send(err);
-    }
-  });
-});
 
 io.on("connection", (socket) => {
   // console.log("A user connected");
