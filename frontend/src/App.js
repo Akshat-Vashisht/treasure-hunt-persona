@@ -12,15 +12,20 @@ import Leaderboard from "./pages/Leaderboard";
 import Endgame from "./pages/Endgame";
 
 function App() {
-  const [teamName, setTeamName] = useState("")
+  const [teamName, setTeamName] = useState("");
   return (
     <Router>
+      
       <Routes>
-        <Route path="/" element={<Register teamName={teamName} setTeamName={setTeamName}/>} />
+        <Route
+          path="/"
+          element={<Register teamName={teamName} setTeamName={setTeamName} />}
+        />
         <Route path="/protected" element={<Protected />} />
         <Route path="/game" element={<GameView teamName={teamName} />} />
         <Route path="/endgame" element={<Endgame teamName={teamName} />} />
         <Route path="/admin/leaderboard" element={<Leaderboard />} />
+        <Route path="*" element={<div className="text-center text-white">404 Page not found</div>} />
       </Routes>
     </Router>
   );
