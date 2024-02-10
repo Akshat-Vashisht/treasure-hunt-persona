@@ -37,9 +37,6 @@ const Register = ({ teamName, setTeamName }) => {
         console.log(res);
         if (res.status === 200) {
           setTeamName(teamName);
-          if (adminPass === process.env.LEADERBOARD_PASS) {
-            navigate("/admin/leaderboard", { state: {adminPass} });
-          }
           navigate("/game");
         }
       } catch (error) {

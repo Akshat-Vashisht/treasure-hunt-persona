@@ -50,7 +50,7 @@ const userTimers = {};
 io.on("connection", (socket) => {
   // console.log("A user connected");
 
-  if (socket.handshake.auth.role === process.env.LEADERBOARD_PASS) {
+  if (socket.handshake.auth.role === "admin") {
     adminSocket = socket;
     // console.log("Admin connected");
 

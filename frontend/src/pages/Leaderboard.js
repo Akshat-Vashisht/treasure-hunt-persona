@@ -19,7 +19,7 @@ const Leaderboard = () => {
     return () => {
       socket.disconnect();
     };
-  }, [adminPass]);
+  }, []);
   // console.log(leaderboard);
   return (
     <div className="text-white px-10 py-8 bg-[#02141E] h-screen">
