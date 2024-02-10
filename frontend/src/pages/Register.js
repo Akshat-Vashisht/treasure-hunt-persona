@@ -30,7 +30,7 @@ const Register = ({ teamName, setTeamName }) => {
     if (checkFields()) {
       try {
         setLoading(true);
-        const res = await axios.post("http://localhost:5000/", newState);
+        const res = await axios.post("https://backend.treasurehuntpersona.in/", newState);
         console.log(res);
         if (res.status === 200) {
           setTeamName(teamName);

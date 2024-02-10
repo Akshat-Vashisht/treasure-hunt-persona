@@ -15,7 +15,7 @@ const GameQues = ({ chestOpened, setChestOpened }) => {
   const [isWrongAnswer, setisWrongAnswer] = useState(false);
   async function fetchAllQuestions() {
     try {
-      const res = await axios.get("http://localhost:5000/questions");
+      const res = await axios.get("https://backend.treasurehuntpersona.in/questions");
       if (res.status == 200) {
         console.log(res);
         setChestOpened(
@@ -39,7 +39,7 @@ const GameQues = ({ chestOpened, setChestOpened }) => {
   async function checkQuestion(data) {
     //todo input check empty
     try {
-      const res = await axios.post("http://65.1.147.240:5000/game", {
+      const res = await axios.post("https://backend.treasurehuntpersona.in/game", {
         qId: data.id,
         userAnswer: answer,
       });
