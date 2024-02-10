@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { FaArrowLeft, FaArrowRight } from "react-icons/fa6";
 import { RxCross1, RxArrowLeft } from "react-icons/rx";
 import PasswordInput from "../Components/PasswordInput";
-
+import { axiosConfig } from "../axiosConfig";
 const Register = ({ teamName, setTeamName }) => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
@@ -30,10 +30,7 @@ const Register = ({ teamName, setTeamName }) => {
     if (checkFields()) {
       try {
         setLoading(true);
-        const res = await axios.post(
-          "https://backend.treasurehuntpersona.in/",
-          newState
-        );
+        const res = await axiosConfig.post("/", newState);
         console.log(res);
         if (res.status === 200) {
           setTeamName(teamName);
@@ -71,12 +68,18 @@ const Register = ({ teamName, setTeamName }) => {
   useEffect(() => {
     console.log(data);
   }, [data]);
+ 
 
+
+
+
+
+  
   return (
     <div className="bg-[#02141E] h-screen overflow-hidden flex flex-col items-center justify-center px-8">
       <div className="grid grid-cols-6">
         <div className=" flex flex-col justify-center items-center col-span-2">
-          <img src="./assets/register-bg.png" alt="Treasure hunt logo" />
+          <img  src="./assets/register-bg.png" alt="Treasure hunt logo" />
           <img
             className="-mt-10"
             src="./assets/treasurehunt-txt.svg"

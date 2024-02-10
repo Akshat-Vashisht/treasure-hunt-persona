@@ -3,6 +3,7 @@ import Chest from "../Components/Chest";
 import { RxCross2 } from "react-icons/rx";
 import { FaArrowRight } from "react-icons/fa6";
 import axios from "axios";
+import { axiosConfig } from "../axiosConfig";
 
 const GameQues = ({ chestOpened, setChestOpened }) => {
   const [openModal, setOpenModal] = useState({
@@ -15,7 +16,7 @@ const GameQues = ({ chestOpened, setChestOpened }) => {
   const [isWrongAnswer, setisWrongAnswer] = useState(false);
   async function fetchAllQuestions() {
     try {
-      const res = await axios.get("https://backend.treasurehuntpersona.in/questions");
+      const res = await axiosConfig.get("/questions");
       if (res.status == 200) {
         console.log(res);
         setChestOpened(
@@ -39,7 +40,7 @@ const GameQues = ({ chestOpened, setChestOpened }) => {
   async function checkQuestion(data) {
     //todo input check empty
     try {
-      const res = await axios.post("https://backend.treasurehuntpersona.in/game", {
+      const res = await axiosConfig.post("/game", {
         qId: data.id,
         userAnswer: answer,
       });

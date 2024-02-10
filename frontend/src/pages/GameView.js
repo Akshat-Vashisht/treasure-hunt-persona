@@ -4,6 +4,7 @@ import { io } from "socket.io-client";
 import axios from "axios";
 import GameQues from "./GameQues";
 import { useNavigate } from "react-router-dom";
+import { axiosConfig } from "../axiosConfig";
 
 const GameView = ({ teamName }) => {
   const navigate = useNavigate();
@@ -24,46 +25,48 @@ const GameView = ({ teamName }) => {
       case 2 : time stop
       case 1 : all crates open
       */
-    console.log("**Game end data sent");
     const cratesOpened = chestOpened.filter((item) => item.isOpen).length;
-    const res = await axios.post("https://backend.treasurehuntpersona.in/endgame", {
+    const res = await axiosConfig.post("/endgame", {
       timer: timer,
       crates: cratesOpened,
       teamName: teamName,
     });
     if (res.status === 200) {
-      navigate("/endgame", { replace: true,
+      navigate("/endgame", {
+        replace: true,
         state: {
           cratesOpened: cratesOpened,
           timer: timer,
-          teamName: teamName
-        } });
+          teamName: teamName,
+        },
+      });
     }
   }
 
   async function updateScore() {
     const cratesOpened = chestOpened.filter((item) => item.isOpen).length;
-    const res = await axios.post("https://backend.treasurehuntpersona.in/endgame", {
+    const res = await axiosConfig.post("/endgame", {
       timer: timer,
       crates: cratesOpened,
       teamName: teamName,
     });
     if (res.status === 200) {
-      console.log(res);
       // navigate('/endgame', {replace:true});
     }
   }
   //Socket Io
   useEffect(() => {
-    const socket = io("https://backend.treasurehuntpersona.in/");
+    const socket = io("http://localhost:5000");
 
     // Get the socket ID once the connection is established
     socket.on("connect", () => {
       setSocketId(socket.id);
 
       // Get the initial timer value from the server
-      axios
-        .get(`https://backend.treasurehuntpersona.in/timer?socketId=${socket.id}`)
+      axiosConfig
+        .get(
+          `/timer?socketId=${socket.id}`
+        )
         .then((response) => {
           setTimer(response.data.timer);
 
@@ -85,7 +88,6 @@ const GameView = ({ teamName }) => {
   // Timer stopped?
   useEffect(() => {
     if (checkTimerStop()) {
-      console.log("load 1");
       gameEnd();
     }
   }, [timer]);
@@ -93,7 +95,6 @@ const GameView = ({ teamName }) => {
   //All crates opened?
   useEffect(() => {
     if (chestOpened.filter((item) => item.isOpen).length === 8) {
-      console.log("load 2");
       gameEnd();
     }
   }, [chestOpened]);

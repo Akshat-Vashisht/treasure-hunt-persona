@@ -6,7 +6,7 @@ const Leaderboard = () => {
   const [leaderboard, setLeaderboard] = useState([]);
 
   useEffect(() => {
-    const socket = io("https://backend.treasurehuntpersona.in/", {
+    const socket = io("http://localhost:5000", {
       auth: {
         role: "admin",
       },
@@ -56,7 +56,7 @@ const Leaderboard = () => {
                   {team.crates}
                 </td>
                 <td className="py-2 border-b border-slate-300">
-                  {team.timeTaken}
+                  {team.timeTaken} s
                 </td>
               </tr>
             );
