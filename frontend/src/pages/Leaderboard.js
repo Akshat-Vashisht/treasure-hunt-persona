@@ -1,22 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { io } from "socket.io-client";
 import { LuCrown } from "react-icons/lu";
-import { useLocation } from "react-router-dom";
 
 const Leaderboard = () => {
   const [leaderboard, setLeaderboard] = useState([]);
-  const location = useLocation();
-  let adminPass;
-
-  if (location.state) {
-    const { adminPass: pass } = location.state;
-    adminPass = pass;
-  }
 
   useEffect(() => {
     const socket = io("https://backend.treasurehuntpersona.in/", {
       auth: {
-        role: adminPass,
+        role: "admin",
       },
     });
 
