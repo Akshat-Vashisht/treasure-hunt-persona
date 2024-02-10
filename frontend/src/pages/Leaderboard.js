@@ -30,7 +30,7 @@ const Leaderboard = () => {
       {/* <div className="h-[50vh] bg-green-400 col-span-1 rounded-lg"></div> */}
       <table className="w-full h-fit col-span-3 rounded-lg overflow-hidden">
         <thead>
-          <tr className="bg-gray-400 text-center ">
+          <tr className="bg-[#000306] text-center ">
             <td className="py-2">Rank</td>
             <td className="py-2">Team Name</td>
             <td className="py-2">Crates Opened</td>
@@ -40,7 +40,9 @@ const Leaderboard = () => {
         <tbody>
           {leaderboard.map((team, index) => {
             return (
-              <tr className="bg-gray-100 text-slate-600 text-center">
+              <tr
+              key={team.teamName}
+              className={`bg-gray-100 text-slate-600 text-center ${index==0 ? "border-2 border-yellow-400 text-yellow-500 bg-gray-50 font-semibold" : ""} `}>
                 <td className="py-2 border-b border-slate-300">{index + 1}</td>
                 <td className="py-2 border-b border-slate-300">
                   {team.teamName}
