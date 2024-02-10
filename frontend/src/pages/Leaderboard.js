@@ -1,14 +1,22 @@
 import React, { useEffect, useState } from "react";
 import { io } from "socket.io-client";
 import { LuCrown } from "react-icons/lu";
+import { useLocation } from "react-router-dom";
 
-const Leaderboard = () => {
+const Leaderboard = ({ adminPass }) => {
   const [leaderboard, setLeaderboard] = useState([]);
+  const location = useLocation();
+  let adminPass;
+
+  if (location.state) {
+    const { adminPass: pass } = location.state;
+    adminPass = pass;
+  }
 
   useEffect(() => {
     const socket = io("https://backend.treasurehuntpersona.in/", {
       auth: {
-        role: "admin",
+        role: adminPass,
       },
     });
 
@@ -19,8 +27,8 @@ const Leaderboard = () => {
     return () => {
       socket.disconnect();
     };
-  }, []);
-  console.log(leaderboard);
+  }, [adminPass]);
+  // console.log(leaderboard);
   return (
     <div className="text-white px-10 py-8 bg-[#02141E] h-screen">
       <h1 className="text-3xl mb-8 flex items-center justify-center gap-2">
@@ -41,8 +49,13 @@ const Leaderboard = () => {
           {leaderboard.map((team, index) => {
             return (
               <tr
-              key={team.teamName}
-              className={`bg-gray-100 text-slate-600 text-center ${index==0 ? "border-2 border-yellow-400 text-yellow-500 bg-gray-50 font-semibold" : ""} `}>
+                key={team.teamName}
+                className={`bg-gray-100 text-slate-600 text-center ${
+                  index == 0
+                    ? "border-2 border-yellow-400 text-yellow-500 bg-gray-50 font-semibold"
+                    : ""
+                } `}
+              >
                 <td className="py-2 border-b border-slate-300">{index + 1}</td>
                 <td className="py-2 border-b border-slate-300">
                   {team.teamName}

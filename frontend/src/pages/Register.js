@@ -30,10 +30,16 @@ const Register = ({ teamName, setTeamName }) => {
     if (checkFields()) {
       try {
         setLoading(true);
-        const res = await axios.post("https://backend.treasurehuntpersona.in/", newState);
+        const res = await axios.post(
+          "https://backend.treasurehuntpersona.in/",
+          newState
+        );
         console.log(res);
         if (res.status === 200) {
           setTeamName(teamName);
+          if (adminPass === process.env.LEADERBOARD_PASS) {
+            navigate("/admin/leaderboard", { state: {adminPass} });
+          }
           navigate("/game");
         }
       } catch (error) {
@@ -86,7 +92,6 @@ const Register = ({ teamName, setTeamName }) => {
           {pageState === 1 && (
             <>
               <div className="bg-[#000306] space-y-5 px-3 py-5 rounded-lg w-[20rem]">
-              
                 <label className="text-[#3CC4ED] text-sm font-semibold">
                   Team Name
                 </label>
@@ -116,7 +121,6 @@ const Register = ({ teamName, setTeamName }) => {
           {pageState === 2 && (
             <>
               <div className="bg-[#000306] space-y-5 p-5 rounded-lg w-[20rem]">
- 
                 <p className="text-white text-center">
                   Do you Confirm your <br /> Team Name as{" "}
                   <span className="text-[#3CC4ED]">"{data.teamName}" </span>
@@ -143,9 +147,12 @@ const Register = ({ teamName, setTeamName }) => {
           {pageState === 3 && (
             <>
               <div className="bg-[#000306] space-y-6 w-[20rem]  px-3 py-5 rounded-lg relative">
-              <button onClick={()=>setPageState(1)} className="absolute right-1 top-1 p-1 border border-white rounded-full text-white">
-                <RxArrowLeft />
-              </button>
+                <button
+                  onClick={() => setPageState(1)}
+                  className="absolute right-1 top-1 p-1 border border-white rounded-full text-white"
+                >
+                  <RxArrowLeft />
+                </button>
                 <label className="text-[#3CC4ED] text-sm font-semibold">
                   Enter the Secret Code
                 </label>

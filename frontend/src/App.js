@@ -15,7 +15,6 @@ function App() {
   const [teamName, setTeamName] = useState("");
   return (
     <Router>
-      
       <Routes>
         <Route
           path="/"
@@ -25,7 +24,12 @@ function App() {
         <Route path="/game" element={<GameView teamName={teamName} />} />
         <Route path="/endgame" element={<Endgame teamName={teamName} />} />
         <Route path="/admin/leaderboard" element={<Leaderboard />} />
-        <Route path="*" element={<div className="text-center text-white">404 Page not found</div>} />
+        <Route
+          path="*"
+          element={
+            <div className="text-center text-white">404 Page not found</div>
+          }
+        />
       </Routes>
     </Router>
   );
