@@ -4,6 +4,7 @@ const socketIO = require("socket.io");
 const cors = require("cors");
 require("dotenv").config();
 
+
 const app = express();
 app.use(express.json());
 const server = http.createServer(app);
@@ -30,7 +31,7 @@ MongoClient.connect(url)
 
 app.use(
   cors({
-    origin: "*",
+    origin: ["https://treasure-hunt-persona-api.vercel.app"],
     credentials: true,
     methods: ["GET", "PUT", "POST", "DELETE"],
   })
@@ -121,6 +122,10 @@ function formatTimer(timerValue) {
   const seconds = String(timerValue % 60).padStart(2, "0");
   return `${minutes}:${seconds}`;
 }
+
+app.get("/", (req, res) => {
+  res.json("Hello");
+});
 
 app.get("/timer", (req, res) => {
   const socketId = req.query.socketId;
@@ -285,4 +290,3 @@ const PORT = 5000;
 server.listen(PORT, () => {
   console.log(`Socket.IO server is running on port ${PORT}`);
 });
-

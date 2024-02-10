@@ -39,7 +39,7 @@ const GameQues = ({ chestOpened, setChestOpened }) => {
   async function checkQuestion(data) {
     //todo input check empty
     try {
-      const res = await axios.post("http://localhost:5000/game", {
+      const res = await axios.post("http://65.1.147.240:5000/game", {
         qId: data.id,
         userAnswer: answer,
       });
