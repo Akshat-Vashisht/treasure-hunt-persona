@@ -31,7 +31,7 @@ MongoClient.connect(url)
 
 app.use(
   cors({
-    origin: ["https://treasure-hunt-persona-api.vercel.app"],
+    origin: "*",
     credentials: true,
     methods: ["GET", "PUT", "POST", "DELETE"],
   })
