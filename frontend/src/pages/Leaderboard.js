@@ -3,7 +3,7 @@ import { io } from "socket.io-client";
 import { LuCrown } from "react-icons/lu";
 import { useLocation } from "react-router-dom";
 
-const Leaderboard = ({ adminPass }) => {
+const Leaderboard = () => {
   const [leaderboard, setLeaderboard] = useState([]);
   const location = useLocation();
   let adminPass;
