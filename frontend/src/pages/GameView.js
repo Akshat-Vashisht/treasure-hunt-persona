@@ -8,7 +8,7 @@ import { axiosConfig } from "../axiosConfig";
 
 const GameView = ({ teamName }) => {
   const navigate = useNavigate();
-  const [timer, setTimer] = useState("02:00");
+  const [timer, setTimer] = useState("60:00");
   const [socketId, setSocketId] = useState(null);
   const [chestOpened, setChestOpened] = useState([]);
   const [confirmUnload, setConfirmUnload] = useState(false);
