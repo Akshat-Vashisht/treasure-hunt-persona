@@ -38,23 +38,23 @@ function App() {
   }, []);
 
   //disable webtools
-  useEffect(() => {
-    const disableDevTools = (e) => {
-      if ((e.ctrlKey && e.shiftKey && e.keyCode === 73) || // Ctrl+Shift+I
-          (e.ctrlKey && e.shiftKey && e.keyCode === 74) || // Ctrl+Shift+J
-          (e.keyCode === 123)) { // F12
-        e.preventDefault();
-      }
-    };
+  // useEffect(() => {
+  //   const disableDevTools = (e) => {
+  //     if ((e.ctrlKey && e.shiftKey && e.keyCode === 73) || // Ctrl+Shift+I
+  //         (e.ctrlKey && e.shiftKey && e.keyCode === 74) || // Ctrl+Shift+J
+  //         (e.keyCode === 123)) { // F12
+  //       e.preventDefault();
+  //     }
+  //   };
 
-    // Listen for keydown events at the document level
-    document.addEventListener('keydown', disableDevTools);
+  //   // Listen for keydown events at the document level
+  //   document.addEventListener('keydown', disableDevTools);
 
-    // Cleanup function to remove the event listener when component unmounts
-    return () => {
-      document.removeEventListener('keydown', disableDevTools);
-    };
-  }, []);
+  //   // Cleanup function to remove the event listener when component unmounts
+  //   return () => {
+  //     document.removeEventListener('keydown', disableDevTools);
+  //   };
+  // }, []);
 
   return (
     <Router>
