@@ -4,7 +4,6 @@ const socketIO = require("socket.io");
 const cors = require("cors");
 require("dotenv").config();
 
-
 const app = express();
 app.use(express.json());
 const server = http.createServer(app);
@@ -142,7 +141,7 @@ app.post("/game", async (req, res) => {
     const qId = req.body.qId;
     const userAnswer = req.body.userAnswer;
     const actualAnswer = await checkAnswer(qId);
-    if (actualAnswer.toLowerCase() === userAnswer.toLowerCase()) {
+    if (actualAnswer.includes(Number(userAnswer))) {
       return res.json({ success: true });
     } else {
       return res.json({ success: false });
