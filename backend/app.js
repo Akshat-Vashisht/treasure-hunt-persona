@@ -14,7 +14,7 @@ const url = process.env.DB_URL;
 const dbName = "testDB";
 const questionsCollection = "questions";
 const leaderboardCollection = "leaderboard";
-const totalGameTime = 120;
+const totalGameTime = 3600;
 
 let db;
 let adminSocket = null;
@@ -56,7 +56,7 @@ io.on("connection", (socket) => {
     sendLeaderboardDataToAdmin();
   } else {
     userTimers[socket.id] = {
-      value: 120,
+      value: 3600,
       interval: null,
     };
 

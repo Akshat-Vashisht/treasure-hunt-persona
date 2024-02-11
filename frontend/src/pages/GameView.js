@@ -56,7 +56,7 @@ const GameView = ({ teamName }) => {
   }
   //Socket Io
   useEffect(() => {
-    const socket = io("http://localhost:5000");
+    const socket = io("https://backend.treasurehuntpersona.in");
 
     // Get the socket ID once the connection is established
     socket.on("connect", () => {

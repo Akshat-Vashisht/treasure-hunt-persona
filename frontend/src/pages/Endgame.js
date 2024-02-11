@@ -5,7 +5,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 const Endgame = () => {
   const location = useLocation();
   const navigate = useNavigate();
-const [timeTaken, setTimeTaken] = useState("-")
+  const [timeTaken, setTimeTaken] = useState("-");
   let cratesOpened, timer, teamName;
 
   if (location.state) {
@@ -26,8 +26,8 @@ const [timeTaken, setTimeTaken] = useState("-")
       let strArr = timer?.split(":");
       let numArr = strArr?.map((item) => +item);
       let timeLeft = numArr[1] + 60 * numArr[0];
-      setTimeTaken(120 - timeLeft)
-      console.log(timeTaken)
+      setTimeTaken(3600 - timeLeft);
+      console.log(timeTaken);
     }
   }, [location]);
 
