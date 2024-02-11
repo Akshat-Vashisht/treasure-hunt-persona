@@ -68,18 +68,12 @@ const Register = ({ teamName, setTeamName }) => {
   useEffect(() => {
     console.log(data);
   }, [data]);
- 
 
-
-
-
-
-  
   return (
     <div className="bg-[#02141E] h-screen overflow-hidden flex flex-col items-center justify-center px-8">
       <div className="grid grid-cols-6">
         <div className=" flex flex-col justify-center items-center col-span-2">
-          <img  src="./assets/register-bg.png" alt="Treasure hunt logo" />
+          <img src="./assets/register-bg.png" alt="Treasure hunt logo" />
           <img
             className="-mt-10"
             src="./assets/treasurehunt-txt.svg"
